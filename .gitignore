@@ -1,0 +1,15 @@
+/node_modules
+/.vscode
+npm-debug.log
+yarn-error.log
+# IntelliJ
+*.iml
+.env
+/.idea
+*.diff
+*.patch
+dist
+/dist
+.project
+.DS_Store
+._.DS_Store
