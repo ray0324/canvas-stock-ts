@@ -2,7 +2,10 @@ const padding = 4;
 const width = 1300;
 const height = 540;
 const masterHeight = 350;
-const gutter = 40;
+const gutter = 30;
+
+import { override, readonly } from 'core-decorators';
+
 
 // 像素密度
 const dpr:number = window.devicePixelRatio;
@@ -11,13 +14,14 @@ const ctx:CanvasRenderingContext2D = <CanvasRenderingContext2D>canvas.getContext
 
 canvas.style.width=`${width}px`;
 canvas.style.height=`${height}px`;
-canvas.style.border=`1px solid #ccc`;
+canvas.style.border=`1px solid #999`;
 
 canvas.width = width*dpr;
 canvas.height= height*dpr;
 
 ctx.scale(dpr,dpr);
-ctx.strokeStyle = '#eee';
+
+ctx.strokeStyle = '#ccc';
 ctx.lineWidth = 1;
 
 function lineTo(p:point){
@@ -86,54 +90,48 @@ class LayOut {
 }
 
 
-let layout = new LayOut();  
+let layout = new LayOut();
 
-let l1 = layout.S1;
-let l2 = layout.S2;
-let l3 = layout.S3;
+let s1 = layout.S1;
+let s2 = layout.S2;
+let s3 = layout.S3;
 
 ctx.beginPath();
-
-ctx.strokeRect(l1[0].x-.5, l1[0].y-.5, l1[2].x-l1[0].x,l1[2].y-l1[0].y);
-ctx.strokeRect(l2[0].x-.5, l2[0].y-.5, l2[2].x-l2[0].x,l2[2].y-l2[0].y);
-ctx.strokeRect(l3[0].x-.5, l3[0].y-.5, l3[2].x-l3[0].x,l3[2].y-l3[0].y);
+ctx.strokeRect(s3[0].x-.5, s3[0].y-.5, s3[2].x-s3[0].x,s3[2].y-s3[0].y);
+ctx.restore();
 
 
+function gGrid(s:point[]){
 
+    let p0:point = Object.assign({}, s[0]);
+    let p1:point = Object.assign({}, s[1]);
+    let p2:point = Object.assign({}, s[2]);
+    let p3:point = Object.assign({}, s[3]);
 
-function gGrid(l1:point[]){
-
-    let p0:point = Object.assign({}, l1[0]);
-    let p1:point = Object.assign({}, l1[1]);
-    let p2:point = Object.assign({}, l1[2]);
-    let p3:point = Object.assign({}, l1[3]);
-
-    // 画网格 平行x
+    // 画网格
     let xGrid = [];
     let yGrid = [];
 
-    let dy = 40;
-    let dx = 120;
+    let dy = 40;  // y轴偏移
+    let dx = 120; // x轴偏移
 
-    // let _p0 = Object.assign({},p0);
-    // let _p1 = Object.assign({},p1);
-    // let _p2 = Object.assign({},p2);
-    // let _p3 = Object.assign({},p3);
+    ctx.beginPath();
+
+    ctx.strokeRect(p0.x-.5, p0.y-.5, p2.x-p0.x,p2.y-p0.y);
 
     for(let p = Object.assign({},p3), q = Object.assign({},p2); p.y > p0.y;){
         yGrid.push([Object.assign({},p), Object.assign({},q)]);
-        p.y -= dy;
-        q.y -= dy;
-        debugger;
+        q.y = p.y -= dy;
     }
 
     for(let p = Object.assign({},p3),q = Object.assign({},p0); p.x < p1.x;){
         xGrid.push([Object.assign({},p), Object.assign({},q)]);
-        p.x += dx;
-        q.x += dx;
+        q.x = p.x += dx;
     }
 
     yGrid.map(p=>{
+        ctx.fillText(p[0].y.toString(),10,p[0].y-10);
+        ctx.fillText(p[0].y.toString(),p[1].x-30,p[1].y-10);
         moveTo(p[0]);
         lineTo(p[1]);
     })
@@ -142,31 +140,35 @@ function gGrid(l1:point[]){
         moveTo(p[0]);
         lineTo(p[1]);
     })
+
+    ctx.stroke();
+    ctx.restore();
+
 }
 
-gGrid(l1);
-gGrid(l2);
+gGrid(s1);
+gGrid(s2);
 
 
+class C1 {
+
+    render():void {
+        console.log('This log is from c1')
+    }
+}
 
 
-// while(_p0.y < p3.y){
-//     yGrid.push([Object.assign({},_p0), Object.assign({},_p1)]);
-//     _p0.y += dy;
-//     _p1.y += dy;
-// }
+class C2 extends C1 {
+    @readonly
+    public age:number = 100;
 
-// while(_p0.y < p3.y){
-//     yGrid.push([Object.assign({},_p0), Object.assign({},_p1)]);
-//     _p0.y += dy;
-//     _p1.y += dy;
-// }
+    @override
+    render():void{
+        console.log('this is  from c2');
+    }
+}
 
+const c = new C2();
+c.render();
+console.log(c.age);
 
-
-
-
-
-
-ctx.stroke();
-// console.log(layout);
