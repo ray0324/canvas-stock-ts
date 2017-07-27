@@ -4,8 +4,11 @@ const height = 540;
 const masterHeight = 350;
 const gutter = 30;
 
-import { override, readonly } from 'core-decorators';
+import { override } from 'core-decorators';
 
+import * as timeLine from '../mock/stocklist_1m_normal.json';
+
+console.log(timeLine);
 
 // 像素密度
 const dpr:number = window.devicePixelRatio;
@@ -37,6 +40,8 @@ type point = {
     x:number,
     y:number
 };
+
+// type points = [point,point];
 
 // 构建一个布局区块
 class LayOut {
@@ -129,9 +134,15 @@ function gGrid(s:point[]){
         q.x = p.x += dx;
     }
 
+    console.log(JSON.stringify(xGrid));
+    console.log(JSON.stringify(yGrid));
+
     yGrid.map(p=>{
+        ctx.fillStyle = 'blue';
+        ctx.textAlign = 'start';
         ctx.fillText(p[0].y.toString(),10,p[0].y-10);
-        ctx.fillText(p[0].y.toString(),p[1].x-30,p[1].y-10);
+        ctx.textAlign = 'end';
+        ctx.fillText(p[0].y.toString(),p[1].x-10,p[1].y-10);
         moveTo(p[0]);
         lineTo(p[1]);
     })
@@ -147,28 +158,62 @@ function gGrid(s:point[]){
 }
 
 gGrid(s1);
-gGrid(s2);
+// gGrid(s2);
+
+console.log(s1);
 
 
-class C1 {
+class Grid {
+    // 边界点
+    readonly p0:point;
+    readonly p1:point;
+    readonly p2:point;
+    readonly p3:point;
 
-    render():void {
-        console.log('This log is from c1')
+    readonly dx = 120;
+    readonly dy = -40;
+
+    // 网格线
+    public gridV:point[][] = [];
+    public gridH:point[][] = [];
+
+    // 构造
+    constructor(s:point[]) {
+        this.p0 = Object.assign({}, s[0]);
+        this.p1 = Object.assign({}, s[1]);
+        this.p2 = Object.assign({}, s[2]);
+        this.p3 = Object.assign({}, s[3]);
+        this.getVerticalGridPoints();
+        this.getHorizontalPoints();
+    }
+
+    /**
+     * 
+     * @param p 起点
+     * @param q 终点
+     * @param ref 参考点
+     * @param delta 偏移量
+     * @param target 目标对象
+     * @param key 坐标名
+     */
+    private getGridPoints(p:point,q:point,ref:point,delta:number,target:Array<Array<point>>,key:keyof point){
+        while(key === 'x' ? p[key] < ref[key] : p[key] > ref[key]) {
+            target.push([{...p},{...q}]);
+            q[key] = p[key] += delta;
+        }
+    }
+
+    public getVerticalGridPoints(){
+        this.getGridPoints({...this.p3},{...this.p0},this.p1,this.dx,this.gridV,'x');
+    }
+
+    public getHorizontalPoints(){
+        this.getGridPoints({...this.p3},{...this.p2},this.p0,this.dy,this.gridH,'y');
     }
 }
 
+const grid =  new Grid(s1);
 
-class C2 extends C1 {
-    @readonly
-    public age:number = 100;
-
-    @override
-    render():void{
-        console.log('this is  from c2');
-    }
-}
-
-const c = new C2();
-c.render();
-console.log(c.age);
-
+console.log(JSON.stringify(grid.gridV));
+console.log(JSON.stringify(grid.gridH));
+console.log(grid);
