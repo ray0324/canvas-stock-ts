@@ -1,6 +1,6 @@
 import {point} from './types';
 
-class Grid {
+export default class Grid {
     // 边界点
     readonly p0:point;
     readonly p1:point;
@@ -16,10 +16,10 @@ class Grid {
 
     // 构造
     constructor(s:point[]) {
-        this.p0 = Object.assign({}, s[0]);
-        this.p1 = Object.assign({}, s[1]);
-        this.p2 = Object.assign({}, s[2]);
-        this.p3 = Object.assign({}, s[3]);
+        this.p0 = { ...s[0]};
+        this.p1 = { ...s[1]};
+        this.p2 = { ...s[2]};
+        this.p3 = { ...s[3]};
         this.getVerticalGridPoints();
         this.getHorizontalPoints();
     }
@@ -34,7 +34,7 @@ class Grid {
      * @param key 坐标名
      */
     private getGridPoints(p:point,q:point,ref:point,delta:number,target:Array<Array<point>>,key:keyof point){
-        while(key === 'x' ? p[key] < ref[key] : p[key] > ref[key]) {
+        while(key === 'x' ? p[key] <= ref[key] : p[key] > ref[key]) {
             target.push([{...p},{...q}]);
             q[key] = p[key] += delta;
         }
