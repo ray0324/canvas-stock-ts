@@ -34,17 +34,19 @@ export default class Grid {
      * @param key 坐标名
      */
     private getGridPoints(p:point,q:point,ref:point,delta:number,target:Array<Array<point>>,key:keyof point){
-        while(key === 'x' ? p[key] <= ref[key] : p[key] > ref[key]) {
+        while(key === 'x' ? p[key] < ref[key] : p[key] > ref[key]) {
             target.push([{...p},{...q}]);
             q[key] = p[key] += delta;
         }
+        q[key] = p[key] = ref[key];
+        target.push([{ ...p }, { ...q }]);
     }
 
-    public getVerticalGridPoints(){
+    private getVerticalGridPoints(){
         this.getGridPoints({...this.p3},{...this.p0},this.p1,this.dx,this.gridV,'x');
     }
 
-    public getHorizontalPoints(){
+    private getHorizontalPoints(){
         this.getGridPoints({...this.p3},{...this.p2},this.p0,this.dy,this.gridH,'y');
     }
 }

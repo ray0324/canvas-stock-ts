@@ -133,13 +133,13 @@ let s3 = layout.S3;
 //     console.log(JSON.stringify(yGrid));
 
 //     yGrid.map(p=>{
-//         ctx.fillStyle = 'blue';
-//         ctx.textAlign = 'start';
-//         ctx.fillText(p[0].y.toString(),10,p[0].y-10);
-//         ctx.textAlign = 'end';
-//         ctx.fillText(p[0].y.toString(),p[1].x-10,p[1].y-10);
-//         moveTo(p[0]);
-//         lineTo(p[1]);
+        // ctx.fillStyle = 'blue';
+        // ctx.textAlign = 'start';
+        // ctx.fillText(p[0].y.toString(),10,p[0].y-10);
+        // ctx.textAlign = 'end';
+        // ctx.fillText(p[0].y.toString(),p[1].x-10,p[1].y-10);
+        // moveTo(p[0]);
+        // lineTo(p[1]);
 //     })
 
 //     xGrid.map(p=>{
@@ -156,6 +156,7 @@ let s3 = layout.S3;
 // gGrid(s2);
 
 const grid =  new Grid(s1);
+const grid2 =  new Grid(s2);
 
 console.log(JSON.stringify(grid.gridV));
 console.log(JSON.stringify(grid.gridH));
@@ -165,8 +166,20 @@ ctx.beginPath();
 ctx.strokeStyle = '#ccc';
 ctx.lineWidth = 1;
 
-[grid.gridV, grid.gridH].map(g=>{
-    g.map(p => {
+[grid.gridV, grid.gridH].map((g,index)=>{
+    g.map((p) => {
+        if(index === 1){
+            ctx.fillStyle = 'blue';
+            ctx.textAlign = 'start';
+            ctx.fillText(p[0].y.toString(), 10, p[0].y - 10);
+            ctx.textAlign = 'end';
+            ctx.fillText(p[0].y.toString(), p[1].x - 10, p[1].y - 10);
+        }
+        if(index === 0){
+            ctx.fillStyle = 'blue';
+            ctx.textAlign = 'end';
+            ctx.fillText(p[0].x.toString(), p[1].x+10, p[0].y - 10);
+        }
         moveTo(p[0]);
         lineTo(p[1]);
     });
