@@ -6,6 +6,8 @@ export default class Grid {
     readonly p1:point;
     readonly p2:point;
     readonly p3:point;
+    readonly width:number;
+    readonly height:number;
 
     readonly dx = 120;
     readonly dy = -40;
@@ -20,6 +22,8 @@ export default class Grid {
         this.p1 = { ...s[1]};
         this.p2 = { ...s[2]};
         this.p3 = { ...s[3]};
+        this.width =  this.p1.x - this.p0.x;
+        this.height = this.p0.y - this.p3.y;
         this.getVerticalGridPoints();
         this.getHorizontalPoints();
     }
