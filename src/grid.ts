@@ -10,7 +10,7 @@ export default class Grid {
     readonly height:number;
 
     readonly dx = 120;
-    readonly dy = -40;
+    readonly dy = -30;
 
     // 网格线
     public gridV:point[][] = [];
@@ -30,27 +30,28 @@ export default class Grid {
 
     /**
      * 
-     * @param p 起点
-     * @param q 终点
-     * @param ref 参考点
+     * @param start 起点
+     * @param end 终点
      * @param delta 偏移量
+     * @param ref 参考点
      * @param target 目标对象
      * @param key 坐标名
      */
-    private getGridPoints(p:point,q:point,ref:point,delta:number,target:Array<Array<point>>,key:keyof point){
-        while(key === 'x' ? p[key] < ref[key] : p[key] > ref[key]) {
-            target.push([{...p},{...q}]);
-            q[key] = p[key] += delta;
+    private getGridPoints(start:point,end:point,ref:point,delta:number,target:Array<Array<point>>,key:keyof point){
+
+        while (key === 'x' ? start[key] < ref[key] : start[key] > ref[key]) {
+            target.push([{...start},{...end}]);
+            end[key] = start[key] += delta;
         }
-        q[key] = p[key] = ref[key];
-        target.push([{ ...p }, { ...q }]);
+        end[key] = start[key] = ref[key];
+        target.push([{ ...start }, { ...end }]);
     }
 
     private getVerticalGridPoints(){
-        this.getGridPoints({...this.p3},{...this.p0},this.p1,this.dx,this.gridV,'x');
+        this.getGridPoints({...this.p0},{...this.p3},this.p2,this.dx,this.gridV,'x');
     }
 
     private getHorizontalPoints(){
-        this.getGridPoints({...this.p3},{...this.p2},this.p0,this.dy,this.gridH,'y');
+        this.getGridPoints({...this.p0},{...this.p1},this.p3,this.dy,this.gridH,'y');
     }
 }

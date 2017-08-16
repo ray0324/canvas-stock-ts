@@ -1,17 +1,24 @@
+
+
+
+
+import { override } from 'core-decorators';
+import { point } from './types';
+import Grid from './grid';
+
+
+
+
+import root from '../mock/stocklist_1d.json';
+console.log(root);
+
+
+// 参数配置
 const padding = 4;
 const width = 1300;
 const height = 540;
 const masterHeight = 350;
 const gutter = 30;
-
-import { override } from 'core-decorators';
-
-import * as timeLine from '../mock/stocklist_1m_normal.json';
-
-import Grid from './grid';
-import { point } from './types';
-
-console.log(timeLine);
 
 // 像素密度
 const dpr:number = window.devicePixelRatio;
@@ -52,30 +59,30 @@ class LayOut {
     constructor(){
         this.S1 = [{
                 x: padding,
-                y: padding
-            },{
-                x: width-padding,
-                y: padding
+                y: masterHeight + padding
             },{
                 x: width-padding,
                 y: masterHeight+padding
+            }, {
+                x: width - padding,
+                y: padding
             },{
                 x: padding,
-                y: masterHeight+padding
+                y: padding
             }
         ]
-        this.S2 =  [{
+        this.S2 = [{
                 x: padding,
-                y: masterHeight+padding*2+gutter
+                y: height - padding
+            }, {
+                x: width - padding,
+                y: height - padding
             },{
-                x: width-padding,
-                y: masterHeight+padding*2+gutter
-            },{
-                x: width-padding,
-                y: height-padding
+                x: width - padding,
+                y: masterHeight + padding * 2 + gutter
             },{
                 x: padding,
-                y: height-padding
+                y: masterHeight + padding * 2 + gutter
             }
         ]
         this.S3 = [{
@@ -106,14 +113,14 @@ const grid = new Grid(s1);
 
 const grid2 =  new Grid(s2);
 
-console.log(JSON.stringify(grid.gridV));
-console.log(JSON.stringify(grid.gridH));
-console.log(grid);
+// console.log(JSON.stringify(grid.gridV));
+// console.log(JSON.stringify(grid.gridH));
+// console.log(grid);
 
 
 
 ctx.beginPath();
-ctx.strokeStyle = '#ccc';
+ctx.strokeStyle = '#3d4449';
 ctx.lineWidth = 1;
 
 [grid.gridV, grid.gridH, grid2.gridV, grid2.gridH].map(item => item.map(p => line(p[0], p[1])));
@@ -121,14 +128,13 @@ ctx.lineWidth = 1;
 
 grid.gridH.pop();
 grid.gridH.map(p=>{
-    ctx.fillStyle = 'blue';
+    ctx.fillStyle = '#ff3d3b';
     ctx.textAlign = 'start';
-    ctx.fillText((grid.p3.y -p[0].y).toString(), 10, p[0].y - 10);
+    ctx.font="10px";
+    ctx.fillText((grid.p0.y -p[0].y).toString(), 5, p[0].y - 5);
     ctx.textAlign = 'end';
-    ctx.fillText((grid.p3.y - p[0].y).toString(), p[1].x - 10, p[1].y - 10);
+    ctx.fillText((grid.p0.y - p[0].y).toString(), p[1].x - 5, p[1].y - 5);
 })
-
-
 
 ctx.stroke();
 ctx.restore();
