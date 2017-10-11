@@ -1,12 +1,12 @@
-import { point } from './types';
+import { Point } from './types';
 import LayOut from './Layout';
 
 export default class Grid {
     // 边界点
-    readonly p0:point;
-    readonly p1:point;
-    readonly p2:point;
-    readonly p3:point;
+    readonly p0:Point;
+    readonly p1:Point;
+    readonly p2:Point;
+    readonly p3:Point;
     readonly width:number;
     readonly height:number;
 
@@ -14,8 +14,8 @@ export default class Grid {
     readonly dy = -30;
 
     // 网格线
-    public gridV:point[][] = [];
-    public gridH:point[][] = [];
+    public gridV:Point[][] = [];
+    public gridH:Point[][] = [];
 
     // 构造
     constructor(s: LayOut) {
@@ -38,7 +38,7 @@ export default class Grid {
      * @param target 目标对象
      * @param key 坐标名
      */
-    private getGridPoints(start:point,end:point,ref:point,delta:number,target:Array<Array<point>>,key:keyof point){
+    private getGridPoints(start:Point,end:Point,ref:Point,delta:number,target:Array<Array<Point>>,key:keyof Point){
 
         while (key === 'x' ? start[key] < ref[key] : start[key] > ref[key]) {
             target.push([{...start},{...end}]);

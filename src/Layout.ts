@@ -4,18 +4,18 @@
  * 
  */
  
-import { point } from './types';
+import { Point } from './types';
 
 export default class LayOut {
-    public top: point;
-    public right: point;
-    public bottom: point;
-    public left: point;
+    public top: Point;
+    public right: Point;
+    public bottom: Point;
+    public left: Point;
 
     public width: number;
     public height: number;
 
-    constructor(top:point,right:point,bottom:point,left:point) {
+    constructor(top:Point,right:Point,bottom:Point,left:Point) {
         this.top = top;
         this.right = right;
         this.bottom = bottom;
