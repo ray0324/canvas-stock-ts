@@ -1,24 +1,21 @@
-
-
-
+///<reference path="../mock/stocklist_1d.d.ts" />
 
 import { override } from 'core-decorators';
 import { point } from './types';
 import Grid from './grid';
 
+// import * as root from '../mock/stocklist_1d';
 
-
-
-import root from '../mock/stocklist_1d.json';
-console.log(root);
+// console.log(root);
+// console.log(root.chartlist);
 
 
 // 参数配置
-const padding = 4;
-const width = 1300;
-const height = 540;
-const masterHeight = 350;
-const gutter = 30;
+const padding: number = 4;
+const width: number = 1300;
+const height: number = 540;
+const masterHeight: number = 350;
+const gutter: number = 30;
 
 // 像素密度
 const dpr:number = window.devicePixelRatio;
@@ -113,12 +110,6 @@ const grid = new Grid(s1);
 
 const grid2 =  new Grid(s2);
 
-// console.log(JSON.stringify(grid.gridV));
-// console.log(JSON.stringify(grid.gridH));
-// console.log(grid);
-
-
-
 ctx.beginPath();
 ctx.strokeStyle = '#3d4449';
 ctx.lineWidth = 1;
@@ -127,6 +118,7 @@ ctx.lineWidth = 1;
 
 
 grid.gridH.pop();
+
 grid.gridH.map(p=>{
     ctx.fillStyle = '#ff3d3b';
     ctx.textAlign = 'start';

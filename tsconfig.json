@@ -9,5 +9,8 @@
     "lib": ["es2015", "es2017", "dom"],
     "allowJs": true,
     "experimentalDecorators": true
-  }
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
 }

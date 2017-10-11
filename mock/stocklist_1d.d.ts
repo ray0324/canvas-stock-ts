@@ -1,10 +1,4 @@
-// declare module "*.json" {
-//     const value: any;
-//     export default value;
-// }
-
-// declare module '*/stocklist_1d.json' {
-
+// declare module 'stocklist_1d.json' {
 //     export interface Stock {
 //         symbol: string;
 //     }
@@ -21,5 +15,4 @@
 //         success: string;
 //         chartlist: Chartlist[];
 //     }
-
 // }
