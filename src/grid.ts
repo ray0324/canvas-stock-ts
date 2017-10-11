@@ -1,4 +1,5 @@
-import {point} from './types';
+import { point } from './types';
+import LayOut from './Layout';
 
 export default class Grid {
     // 边界点
@@ -17,11 +18,11 @@ export default class Grid {
     public gridH:point[][] = [];
 
     // 构造
-    constructor(s:point[]) {
-        this.p0 = { ...s[0]};
-        this.p1 = { ...s[1]};
-        this.p2 = { ...s[2]};
-        this.p3 = { ...s[3]};
+    constructor(s: LayOut) {
+        this.p0 = { ...s.top};
+        this.p1 = { ...s.right};
+        this.p2 = { ...s.bottom};
+        this.p3 = { ...s.left};
         this.width =  this.p1.x - this.p0.x;
         this.height = this.p0.y - this.p3.y;
         this.getVerticalGridPoints();
