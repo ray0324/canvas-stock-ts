@@ -1,6 +1,6 @@
 import { override } from 'core-decorators';
 import { Point } from './types';
-import Grid from './grid';
+import Grid from './Grid';
 import LayOut from './Layout';
 import * as Utils from './Utils';
 
@@ -47,10 +47,10 @@ const x3 = x1;
 
 
 const y2 = {
-    top: height - padding,
-    right: height - padding,
-    bottom: masterHeight + padding * 2 + gutter,
-    left: masterHeight + padding * 2 + gutter,
+    top: masterHeight + padding * 2 + gutter,
+    right: masterHeight + padding * 2 + gutter,
+    bottom: height - padding,
+    left: height - padding,
 }
 
 const y3 = {
@@ -64,31 +64,24 @@ let s1 = new LayOut({x: x1.top, y:y1.top },{ x:x1.right, y: y1.right }, { x: x1.
 let s2 = new LayOut({x: x2.top, y:y2.top },{ x:x2.right, y: y2.right }, { x: x2.bottom,y: y2.bottom },{x: x2.left,y:y2.left });
 let s3 = new LayOut({x: x3.top, y:y3.top },{ x:x3.right, y: y3.right }, { x: x3.bottom,y: y3.bottom },{x: x3.left,y:y3.left });
 
-console.log('s1:',s1);
+console.log('layout:',s1);
 
+const grid1 = new Grid(s1, 120, 30 );
+const grid2 = new Grid(s2, 120, 30);
+const grid3 = new Grid(s3, 12, 3);
 
+console.log('grid:',grid1);
 
-const grid = new Grid(s1);
-const grid2 =  new Grid(s2);
-const grid3 =  new Grid(s3);
+ctx.save()
 
-ctx.beginPath();
 ctx.strokeStyle = '#3d4449';
 ctx.lineWidth = 1;
-
-[grid.gridV, grid.gridH, grid2.gridV, grid2.gridH].map(item => item.map(p => Utils.line(ctx,p[0], p[1])));
-
-
-// grid.gridH.pop();
-
-// grid.gridH.map(p=>{
-//     ctx.fillStyle = '#ff3d3b';
-//     ctx.textAlign = 'start';
-//     ctx.font="10px";
-//     ctx.fillText((grid.p0.y -p[0].y).toString(), 5, p[0].y - 5);
-//     ctx.textAlign = 'end';
-//     ctx.fillText((grid.p0.y - p[0].y).toString(), p[1].x - 5, p[1].y - 5);
-// })
-
+ctx.beginPath();
+grid1.gridX.map(line=>Utils.line(ctx,line))
+grid1.gridY.map(line=>Utils.line(ctx,line))
+grid2.gridX.map(line=>Utils.line(ctx,line))
+grid2.gridY.map(line=>Utils.line(ctx,line))
+grid3.gridX.map(line=>Utils.line(ctx,line))
+grid3.gridY.map(line=>Utils.line(ctx,line))
 ctx.stroke();
-// ctx.restore();
+ctx.restore();

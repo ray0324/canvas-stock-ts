@@ -1,58 +1,44 @@
-import { Point } from './types';
+import { Point, Line } from './types';
 import LayOut from './Layout';
 
+// 定义线段类型
 export default class Grid {
-    // 边界点
-    readonly p0:Point;
-    readonly p1:Point;
-    readonly p2:Point;
-    readonly p3:Point;
-    readonly width:number;
-    readonly height:number;
+    private top: Point;
+    private right: Point;
+    private bottom: Point;
+    private left: Point;
 
-    readonly dx = 120;
-    readonly dy = -30;
+    private offsetX: number;
+    private offsetY: number;
 
-    // 网格线
-    public gridV:Point[][] = [];
-    public gridH:Point[][] = [];
+    public gridX: Line[] = [];
+    public gridY: Line[] = [];
 
     // 构造
-    constructor(s: LayOut) {
-        this.p0 = { ...s.top};
-        this.p1 = { ...s.right};
-        this.p2 = { ...s.bottom};
-        this.p3 = { ...s.left};
-        this.width =  this.p1.x - this.p0.x;
-        this.height = this.p0.y - this.p3.y;
-        this.getVerticalGridPoints();
-        this.getHorizontalPoints();
+    constructor(s: LayOut, offsetX: number, offsetY: number) {
+        this.top = { ...s.top };
+        this.right = { ...s.right };
+        this.bottom = { ...s.bottom };
+        this.left = { ...s.left };
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        this.getGridLine();
     }
 
-    /**
-     * 
-     * @param start 起点
-     * @param end 终点
-     * @param delta 偏移量
-     * @param ref 参考点
-     * @param target 目标对象
-     * @param key 坐标名
-     */
-    private getGridPoints(start:Point,end:Point,ref:Point,delta:number,target:Array<Array<Point>>,key:keyof Point){
-
-        while (key === 'x' ? start[key] < ref[key] : start[key] > ref[key]) {
-            target.push([{...start},{...end}]);
-            end[key] = start[key] += delta;
+    private getGridLine() {
+        for(let y = this.left.y; y > this.top.y; y -= this.offsetY){
+            let start: Point = { x: this.left.x, y }
+            let end: Point ={ x: this.bottom.x, y }
+            this.gridX.push({start,end})
         }
-        end[key] = start[key] = ref[key];
-        target.push([{ ...start }, { ...end }]);
-    }
+        // 添加终点
+        this.gridX.push({ start:this.top, end:this.right })
 
-    private getVerticalGridPoints(){
-        this.getGridPoints({...this.p0},{...this.p3},this.p2,this.dx,this.gridV,'x');
-    }
-
-    private getHorizontalPoints(){
-        this.getGridPoints({...this.p0},{...this.p1},this.p3,this.dy,this.gridH,'y');
+        for(let x = this.left.x; x < this.bottom.x; x += this.offsetX){
+            let start: Point = { x, y:this.left.y }
+            let end: Point ={ x, y:this.top.y }
+            this.gridY.push({start,end})
+        }
+        this.gridY.push({ start: this.bottom, end: this.right })
     }
 }
