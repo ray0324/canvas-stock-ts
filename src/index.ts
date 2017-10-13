@@ -49,19 +49,19 @@ canvas.width = width*dpr;
 canvas.height= height*dpr;
 
 // 基础配置
-ctx.scale(dpr,dpr);
+// ctx.scale(dpr,dpr);
 
 const x1 = {
-    top: padding,
-    right: width - padding,
-    bottom: width - padding,
-    left: padding,
+    top: padding*dpr,
+    right: (width - padding)*dpr,
+    bottom: (width - padding)*dpr,
+    left: padding*dpr,
 }
 const y1 = {
-    top: padding,
-    right: padding,
-    bottom: masterHeight + padding,
-    left: masterHeight + padding,
+    top: padding*dpr,
+    right: padding*dpr,
+    bottom: (masterHeight + padding)*dpr,
+    left: (masterHeight + padding)*dpr,
 }
 
 const x2 = x1;
@@ -70,17 +70,17 @@ const x3 = x1;
 
 
 const y2 = {
-    top: masterHeight + padding * 2 + gutter,
-    right: masterHeight + padding * 2 + gutter,
-    bottom: height - padding,
-    left: height - padding,
+    top: (masterHeight + padding * 2 + gutter)*dpr,
+    right: (masterHeight + padding * 2 + gutter)*dpr,
+    bottom: (height - padding)*dpr,
+    left: (height - padding)*dpr,
 }
 
 const y3 = {
-    top: masterHeight + padding * 2,
-    right: masterHeight + padding * 2,
-    bottom: masterHeight + padding + gutter,
-    left: masterHeight + padding + gutter,
+    top: (masterHeight + padding * 2)*dpr,
+    right: (masterHeight + padding * 2)*dpr,
+    bottom: (masterHeight + padding + gutter)*dpr,
+    left: (masterHeight + padding + gutter)*dpr,
 }
 
 let s1 = new LayOut({x: x1.top, y:y1.top },{ x:x1.right, y: y1.right }, { x: x1.bottom,y: y1.bottom },{x: x1.left,y:y1.left });
@@ -109,10 +109,9 @@ console.log(currentLine);
 console.log('layout:',s1);
 console.log(scale);
 
-
-const grid1 = new Grid(s1, 120, 20 );
-// const grid2 = new Grid(s2, 120, 20);
-// const grid3 = new Grid(s3, 1000000, 1000000);
+const grid1 = new Grid(s1, 120*dpr, 30*dpr );
+const grid2 = new Grid(s2, 120*dpr, 30*dpr);
+const grid3 = new Grid(s3, 12000*dpr, 3000*dpr);
 
 console.log('grid:',grid1);
 
