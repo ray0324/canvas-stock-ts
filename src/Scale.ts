@@ -7,6 +7,10 @@ export default class Scale {
     public yMin:number;
     public yMax:number;
 
+    public deltaData:number;
+    public dataMin:number;
+    public openData:number;
+
     public deltaX:number;
     public deltaY:number;
 
@@ -31,7 +35,10 @@ export default class Scale {
         const dataMin = Math.min(...arr);
         const deltaData = dataMax - dataMin;
         const scale = this.deltaY / deltaData;
-
+        this.deltaData = deltaData;
+        this.dataMin = dataMin;
+        this.openData =arr[0];
+        // 坐标
         this.y = data.map((item: any) => {
             return this.yMax - (item.current - dataMin) * scale
         });

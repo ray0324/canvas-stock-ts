@@ -6,26 +6,9 @@ import * as Utils from './Utils';
 import * as stocklist_1d from '../mock/stocklist_1d.json';
 import Scale from './Scale';
 
-
-interface Stock {
-    symbol: string;
-}
-
-interface Chartlist {
-    volume: number;
-    avg_price: number;
-    current: number;
-    time: string;
-}
-
-interface RootObject {
-    stock: Stock;
-    success: string;
-    chartlist: Chartlist[];
-}
-
 const root = <any>stocklist_1d;
-console.log(root.chartlist);
+
+console.log(root)
 
 // 像素密度
 const dpr:number = window.devicePixelRatio;
@@ -38,7 +21,7 @@ const padding: number = 4;
 const width: number = 1300;
 const height: number = 540;
 const masterHeight: number = 350;
-const gutter: number = 40;
+const gutter: number = 30;
 
 // 初始化
 canvas.style.width=`${width}px`;
@@ -87,21 +70,22 @@ let s1 = new LayOut({x: x1.top, y:y1.top },{ x:x1.right, y: y1.right }, { x: x1.
 let s2 = new LayOut({x: x2.top, y:y2.top },{ x:x2.right, y: y2.right }, { x: x2.bottom,y: y2.bottom },{x: x2.left,y:y2.left });
 let s3 = new LayOut({x: x3.top, y:y3.top },{ x:x3.right, y: y3.right }, { x: x3.bottom,y: y3.bottom },{x: x3.left,y:y3.left });
 
+
 let scale = new Scale(s1, root.chartlist);
 
 let currentLine: Point[] = scale.y.map((item,index)=>{
     const dx = scale.deltaX / scale.y.length;
     return {
-        x: index * dx + scale.xMin,
-        y: item
+        x: Math.floor(index * dx + scale.xMin),
+        y: Math.floor(item)
     }
 })
 
 let avgPriceLine: Point[] = scale.avg.map((item,index)=>{
     const dx = scale.deltaX / scale.avg.length;
     return {
-        x: index * dx + scale.xMin,
-        y: item
+        x: Math.floor(index * dx + scale.xMin),
+        y: Math.floor(item)
     }
 })
 
@@ -109,41 +93,47 @@ console.log(currentLine);
 console.log('layout:',s1);
 console.log(scale);
 
-const grid1 = new Grid(s1, 120*dpr, 30*dpr );
-const grid2 = new Grid(s2, 120*dpr, 30*dpr);
-const grid3 = new Grid(s3, 12000*dpr, 3000*dpr);
+const grid1 = new Grid(s1, 120*dpr, 20*dpr );
+const grid2 = new Grid(s2, 120*dpr, 20*dpr);
 
 console.log('grid:',grid1);
 
+
+// 绘制网格线--------------------------------------
 ctx.save()
 
 ctx.strokeStyle = 'rgba(255,255,255,0.1)';
 ctx.lineWidth = 0.5;
 ctx.beginPath();
-grid1.gridX.map(line=>Utils.line(ctx,line))
-grid1.gridY.map(line=>Utils.line(ctx,line))
+grid1.gridH.map(line=>Utils.line(ctx,line));
 
-// grid2.gridX.map(line=>Utils.line(ctx,line))
-// grid2.gridY.map(line=>Utils.line(ctx,line))
-// grid3.gridX.map(line=>Utils.line(ctx,line))
-// grid3.gridY.map(line=>Utils.line(ctx,line))
+grid1.gridV.map(line=>Utils.line(ctx,line))
+
+grid2.gridH.map(line=>Utils.line(ctx,line))
+grid2.gridV.map(line=>Utils.line(ctx,line))
+
+Utils.moveTo(ctx, s3.top)
+Utils.lineTo(ctx, s3.right)
+Utils.lineTo(ctx, s3.bottom)
+Utils.lineTo(ctx, s3.left)
+
+ctx.strokeRect(s3.top.x-0.5,s3.top.y-0.5,s3.width,s3.height)
+ctx.strokeRect(grid1.top.x-0.5,grid1.top.y-0.5,grid1.width,grid1.height)
+
 ctx.stroke();
 ctx.restore();
-
+// 绘制网格线--------------------------------------
 
 ctx.save()
-
 ctx.beginPath();
 ctx.strokeStyle = '#09f';
-ctx.lineWidth = 1;
+ctx.lineWidth = 2;
 ctx.lineCap = "round";
 console.log(currentLine[0]);
-
 Utils.moveTo(ctx, currentLine[0]);
 currentLine.map(point => Utils.lineTo(ctx, point))
 ctx.stroke();
 ctx.restore();
-
 ctx.save();
 
 
@@ -152,10 +142,23 @@ ctx.save();
 ctx.beginPath();
 ctx.strokeStyle = '#f90';
 ctx.lineCap = "round";
-ctx.lineWidth = 1;
-console.log(avgPriceLine[0]);
+ctx.lineWidth = 2;
 
+console.log(avgPriceLine[0]);
 Utils.moveTo(ctx, avgPriceLine[0]);
 avgPriceLine.map(point => Utils.lineTo(ctx, point))
 ctx.stroke();
 ctx.restore();
+
+
+ctx.save();
+ctx.fillStyle='red';
+ctx.font='18px Arial';
+grid1.labelY.map(item=>{
+  ctx.fillText((scale.dataMin+item.val*scale.deltaData).toFixed(2),item.pos.x+3,item.pos.y-5);
+
+});
+
+grid1.labelY2.map(item=>{
+  ctx.fillText(((scale.dataMin+item.val*scale.deltaData-scale.openData)/scale.openData*100).toFixed(2)+'%',item.pos.x-50,item.pos.y-5);
+})
