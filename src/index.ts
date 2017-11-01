@@ -2,13 +2,13 @@ import { override } from 'core-decorators';
 import { Point } from './types';
 import Grid from './Grid';
 import LayOut from './Layout';
-import * as Utils from './Utils';
-import * as stocklist_1d from '../mock/stocklist_1d.json';
-import Scale from './Scale';
+// import * as Utils from './Utils';
+// import * as stocklist_1d from '../mock/stocklist_1d2.json';
+// import Scale from './Scale';
 
-const root = <any>stocklist_1d;
+// const root = <any>stocklist_1d;
 
-console.log(root)
+// console.log(root)
 
 // 像素密度
 const dpr:number = window.devicePixelRatio;
@@ -71,94 +71,123 @@ let s2 = new LayOut({x: x2.top, y:y2.top },{ x:x2.right, y: y2.right }, { x: x2.
 let s3 = new LayOut({x: x3.top, y:y3.top },{ x:x3.right, y: y3.right }, { x: x3.bottom,y: y3.bottom },{x: x3.left,y:y3.left });
 
 
-let scale = new Scale(s1, root.chartlist);
+// let scale = new Scale(s1, root.chartlist);
+//
+// let currentLine: Point[] = scale.y.map((item,index)=>{
+//     const dx = scale.deltaX / scale.y.length;
+//     return {
+//         x: Math.floor(index * dx + scale.xMin),
+//         y: Math.floor(item)
+//     }
+// })
+//
+// let avgPriceLine: Point[] = scale.avg.map((item,index)=>{
+//     const dx = scale.deltaX / scale.avg.length;
+//     return {
+//         x: Math.floor(index * dx + scale.xMin),
+//         y: Math.floor(item)
+//     }
+// })
+//
+// console.log(currentLine);
+// console.log('layout:',s1);
+// console.log(scale);
 
-let currentLine: Point[] = scale.y.map((item,index)=>{
-    const dx = scale.deltaX / scale.y.length;
-    return {
-        x: Math.floor(index * dx + scale.xMin),
-        y: Math.floor(item)
-    }
-})
+// const grid1 = new Grid(s1, 20*dpr ,new Date('2017-10-20 09:30'),new Date('2017-10-20 15:00'));
+// const grid2 = new Grid(s2, 120*dpr, 20*dpr);
 
-let avgPriceLine: Point[] = scale.avg.map((item,index)=>{
-    const dx = scale.deltaX / scale.avg.length;
-    return {
-        x: Math.floor(index * dx + scale.xMin),
-        y: Math.floor(item)
-    }
-})
-
-console.log(currentLine);
-console.log('layout:',s1);
-console.log(scale);
-
-const grid1 = new Grid(s1, 120*dpr, 20*dpr );
-const grid2 = new Grid(s2, 120*dpr, 20*dpr);
+const grid1 = new Grid(s1, [0, 30, 30, 30,30,30,30,30,30],50*dpr);
+const grid3 = new Grid(s1, [0, 30, 30, 30, 30, 30, 30, 30, 30],30*dpr);
+const grid2 = new Grid(s2, [0, 30, 30, 30,30,30,30,30,30],25*dpr);
+// const grid3 = new Grid(s3, [0, 240],30);
 
 console.log('grid:',grid1);
+grid1.drawLine(ctx);
+grid2.drawLine(ctx);
+// grid1.drawYline(ctx);
+// grid2.drawXline(ctx);
+// grid2.drawYline(ctx);
+// grid3.drawXline(ctx);
+// grid3.drawYline(ctx);
 
-
-// 绘制网格线--------------------------------------
-ctx.save()
-
-ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-ctx.lineWidth = 0.5;
-ctx.beginPath();
-grid1.gridH.map(line=>Utils.line(ctx,line));
-
-grid1.gridV.map(line=>Utils.line(ctx,line))
-
-grid2.gridH.map(line=>Utils.line(ctx,line))
-grid2.gridV.map(line=>Utils.line(ctx,line))
-
-Utils.moveTo(ctx, s3.top)
-Utils.lineTo(ctx, s3.right)
-Utils.lineTo(ctx, s3.bottom)
-Utils.lineTo(ctx, s3.left)
-
-ctx.strokeRect(s3.top.x-0.5,s3.top.y-0.5,s3.width,s3.height)
-ctx.strokeRect(grid1.top.x-0.5,grid1.top.y-0.5,grid1.width,grid1.height)
-
-ctx.stroke();
-ctx.restore();
+// grid1.drawGrid(ctx);
 // 绘制网格线--------------------------------------
 
-ctx.save()
-ctx.beginPath();
-ctx.strokeStyle = '#09f';
-ctx.lineWidth = 2;
-ctx.lineCap = "round";
-console.log(currentLine[0]);
-Utils.moveTo(ctx, currentLine[0]);
-currentLine.map(point => Utils.lineTo(ctx, point))
-ctx.stroke();
-ctx.restore();
-ctx.save();
+// ctx.save()
+//
+// ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+// ctx.lineWidth = 0.5;
+// ctx.beginPath();
+// grid1.gridH.map(line=>Utils.line(ctx,line));
+//
+// grid1.gridV.map(line=>Utils.line(ctx,line))
+//
+// grid2.gridH.map(line=>Utils.line(ctx,line))
+// grid2.gridV.map(line=>Utils.line(ctx,line))
+//
+// Utils.moveTo(ctx, s3.top)
+// Utils.lineTo(ctx, s3.right)
+// Utils.lineTo(ctx, s3.bottom)
+// Utils.lineTo(ctx, s3.left)
+//
+// ctx.strokeRect(s3.top.x-0.5,s3.top.y-0.5,s3.width,s3.height)
+// ctx.strokeRect(grid1.top.x-0.5,grid1.top.y-0.5,grid1.width,grid1.height)
+//
+// ctx.stroke();
+// ctx.restore();
+// 绘制网格线--------------------------------------
 
 
 
 
-ctx.beginPath();
-ctx.strokeStyle = '#f90';
-ctx.lineCap = "round";
-ctx.lineWidth = 2;
-
-console.log(avgPriceLine[0]);
-Utils.moveTo(ctx, avgPriceLine[0]);
-avgPriceLine.map(point => Utils.lineTo(ctx, point))
-ctx.stroke();
-ctx.restore();
-
-
-ctx.save();
-ctx.fillStyle='red';
-ctx.font='18px Arial';
-grid1.labelY.map(item=>{
-  ctx.fillText((scale.dataMin+item.val*scale.deltaData).toFixed(2),item.pos.x+3,item.pos.y-5);
-
-});
-
-grid1.labelY2.map(item=>{
-  ctx.fillText(((scale.dataMin+item.val*scale.deltaData-scale.openData)/scale.openData*100).toFixed(2)+'%',item.pos.x-50,item.pos.y-5);
-})
+// ctx.save();
+// ctx.fillStyle='red';
+// ctx.font='200 18px Helvatical';
+// ctx.textAlign='right';
+// grid1.labelY.map(item=>{
+//   ctx.fillText((scale.dataMin+item.val*scale.deltaData).toFixed(2),item.pos.x-5,item.pos.y-5);
+//
+// });
+// ctx.textAlign='right';
+// grid1.labelY2.map(item=>{
+//   ctx.fillText(((scale.dataMin+item.val*scale.deltaData-scale.openData)/scale.openData*100).toFixed(2)+'%',item.pos.x-3,item.pos.y-5);
+// })
+// ctx.restore();
+//
+// ctx.save()
+// ctx.beginPath();
+// ctx.strokeStyle = '#09f';
+// ctx.lineWidth = 2;
+// ctx.lineCap = "round";
+// console.log(currentLine[0]);
+// Utils.moveTo(ctx, currentLine[0]);
+// currentLine.map(point => Utils.lineTo(ctx, point))
+// ctx.stroke();
+// ctx.restore();
+// ctx.save();
+//
+//
+//
+//
+// ctx.beginPath();
+// ctx.strokeStyle = '#f90';
+// ctx.lineCap = "round";
+// ctx.lineWidth = 2;
+//
+// console.log(avgPriceLine[0]);
+// Utils.moveTo(ctx, avgPriceLine[0]);
+// avgPriceLine.map(point => Utils.lineTo(ctx, point))
+// ctx.stroke();
+// ctx.restore();
+//
+// ctx.save();
+// (<any>window).ctx=ctx;
+// ctx.beginPath();
+//
+// ctx.setLineDash([26,6,6,6]);
+// ctx.strokeStyle="#f09"
+// ctx.moveTo(1300,0)
+// ctx.lineTo(1300,1080);
+// ctx.moveTo(0,540)
+// ctx.lineTo(2600,540);
+// ctx.stroke()
