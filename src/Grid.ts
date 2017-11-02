@@ -30,6 +30,14 @@ export default class Grid {
   public xGridLines:Array<Line> = [];
   public yGridLines:Array<Line> = [];
 
+  public yGridCentreLine:Line;
+
+  // 网格与x轴,y轴的焦点集合
+  public xGridStartPoints: Point[] = [];
+  public xGridEndPoints: Point[] = [];
+  public yGridStartPoints: Point[] = [];
+  public yGridEndPoints: Point[] = [];
+
   // 构造
   constructor(layout: LayOut,xGutterGroup:Array<number>,yGridGutter:number) {
     // 边界点
@@ -54,11 +62,25 @@ export default class Grid {
     this.getXgridLine();
     // 获取垂直于y轴的网格线
     this.getYgridLine();
+    this.yGridCentreLine = this.getYgridCentreLine();
   }
 
   // 获取x轴线 单位长度
   private getXUnit() {
     return this.width / this.xGutterGroup.reduce((a:number, b:number)=>a+b);
+  }
+
+  // 获取y轴网格中心线
+  private getYgridCentreLine(){
+    const start = {
+      x:this.top.x,
+      y:(this.top.y+this.bottom.y) / 2
+    }
+    const end = {
+        x:this.right.x,
+        y:(this.top.y+this.bottom.y) / 2
+    }
+    return { start, end };
   }
 
   // 计算垂直于y轴的格线条数
@@ -69,22 +91,25 @@ export default class Grid {
     return this.height / this.yGridGutter;
   }
 
+
   // 计算垂直于x轴线的线段集合
   private getXgridLine() {
     let i:number = 0,x:number = this.left.x;
     while(i<this.xGutterGroup.length) {
       x+=this.xGutterGroup[i]*this.xUnit;
       this.xGridLines.push({
-        start: {x,y:this.bottom.y},
-        end:{x,y:this.top.y}
+        start: {x: Math.round(x),y: this.bottom.y},
+        end: {x: Math.round(x),y: this.top.y}
       });
+      this.xGridStartPoints.push({x: Math.round(x),y: this.bottom.y});
+      this.xGridEndPoints.push({x: Math.round(x),y: this.top.y});
       i++;
     }
   }
 
   //计算垂直于y轴的线段集合
   private getYgridLine() {
-    let ry:number = (this.height - (this.yGridGutterAmount-2)*this.yGridGutter)/2;
+    let ry:number = (this.height - (this.yGridGutterAmount-2) * this.yGridGutter) / 2;
     let dy:number = 0;
     for(let i:number = 0;i<=this.yGridGutterAmount;i++) {
       if(i === 0){
@@ -94,10 +119,11 @@ export default class Grid {
       }else{
         dy += this.yGridGutter;
       }
-      this.yGridLines.push( {
-        start:{x:this.left.x, y:Math.round(this.left.y-dy)},
-        end:{x:this.bottom.x, y:Math.round(this.left.y-dy)}
-      });
+      let start = {x:this.left.x, y:Math.round(this.left.y-dy)};
+      let end = {x:this.bottom.x, y:Math.round(this.left.y-dy)};
+      this.yGridLines.push( { start, end });
+      this.yGridStartPoints.push(start);
+      this.yGridEndPoints.push(end);
     }
   }
 
@@ -107,9 +133,35 @@ export default class Grid {
     ctx.beginPath();
     this.xGridLines.map(line=>Utils.line(ctx,line));
     this.yGridLines.map(line=>Utils.line(ctx,line));
-    ctx.strokeStyle = 'rgba(255,255,255,.8)';
+    ctx.strokeStyle = 'rgba(255,255,255,.2)';
     ctx.lineWidth = 0.5;
     ctx.stroke();
+    ctx.restore();
+  }
+  // 绘制标尺
+  public drawLabel(ctx:CanvasRenderingContext2D) {
+    ctx.save();
+    ctx.fillStyle='rgba(255,255,255,.5)';
+    ctx.font='200 12px Consolas';
+    ctx.textAlign='center';
+    this.xGridStartPoints.map((point,index)=>{
+      const time = ['09:30','10:00','10:30','11:00','11:30/13:00','13:30','14:00','14:30','15:00']
+      ctx.fillText(time[index],point.x,point.y+15)
+    })
+    ctx.textAlign='right';
+    this.yGridStartPoints.map((point,index)=>{
+      if(index === 0 || index === this.yGridStartPoints.length-1) return;
+      let label = this.yGridCentreLine.start.y-point.y;
+      label > 0 ? ctx.fillStyle='#df3d3d': ctx.fillStyle='#18c346';
+      ctx.fillText(label.toFixed(0),point.x-5,point.y)
+    })
+    ctx.textAlign='left';
+    this.yGridEndPoints.map((point,index)=>{
+      if(index === 0 || index === this.yGridEndPoints.length-1) return;
+      let label = (this.yGridCentreLine.start.y-point.y)/300;
+      label > 0 ? ctx.fillStyle='#df3d3d': ctx.fillStyle='#18c346';
+      ctx.fillText(label.toFixed(2)+'%',point.x+5,point.y)
+    })
     ctx.restore();
   }
 }

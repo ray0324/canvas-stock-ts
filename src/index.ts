@@ -2,13 +2,13 @@ import { override } from 'core-decorators';
 import { Point } from './types';
 import Grid from './Grid';
 import LayOut from './Layout';
-// import * as Utils from './Utils';
-// import * as stocklist_1d from '../mock/stocklist_1d2.json';
-// import Scale from './Scale';
+import * as Utils from './Utils';
+import * as stocklist_1d from '../mock/stocklist_1d.json';
+import Scale from './Scale';
 
-// const root = <any>stocklist_1d;
+const root = <any>stocklist_1d;
 
-// console.log(root)
+console.log(root)
 
 // 像素密度
 const dpr:number = window.devicePixelRatio;
@@ -17,7 +17,7 @@ const ctx:CanvasRenderingContext2D = <CanvasRenderingContext2D>canvas.getContext
 
 
 // 参数配置
-const padding: number = 4;
+const padding: number = 5;
 const width: number = 1300;
 const height: number = 540;
 const masterHeight: number = 350;
@@ -35,16 +35,17 @@ canvas.height= height*dpr;
 // ctx.scale(dpr,dpr);
 
 const x1 = {
-    top: padding*dpr,
-    right: (width - padding)*dpr,
-    bottom: (width - padding)*dpr,
-    left: padding*dpr,
+    top: padding*dpr+45,
+    right: (width - padding)*dpr-45,
+    bottom: (width - padding)*dpr-45,
+    left: padding*dpr+45,
 }
+
 const y1 = {
-    top: padding*dpr,
-    right: padding*dpr,
-    bottom: (masterHeight + padding)*dpr,
-    left: (masterHeight + padding)*dpr,
+    top: padding*dpr+20,
+    right: padding*dpr+20,
+    bottom: (masterHeight + padding)*dpr-20,
+    left: (masterHeight + padding)*dpr-20,
 }
 
 const x2 = x1;
@@ -71,23 +72,25 @@ let s2 = new LayOut({x: x2.top, y:y2.top },{ x:x2.right, y: y2.right }, { x: x2.
 let s3 = new LayOut({x: x3.top, y:y3.top },{ x:x3.right, y: y3.right }, { x: x3.bottom,y: y3.bottom },{x: x3.left,y:y3.left });
 
 
-// let scale = new Scale(s1, root.chartlist);
+let scale = new Scale(s1, root.chartlist);
 //
-// let currentLine: Point[] = scale.y.map((item,index)=>{
-//     const dx = scale.deltaX / scale.y.length;
-//     return {
-//         x: Math.floor(index * dx + scale.xMin),
-//         y: Math.floor(item)
-//     }
-// })
+let currentLine: Point[] = scale.y.map((item,index)=>{
+    const dx = 5;
+    return {
+        x: Math.floor(index * dx + scale.xMin),
+        y: Math.floor(item)
+    }
+})
 //
-// let avgPriceLine: Point[] = scale.avg.map((item,index)=>{
-//     const dx = scale.deltaX / scale.avg.length;
-//     return {
-//         x: Math.floor(index * dx + scale.xMin),
-//         y: Math.floor(item)
-//     }
-// })
+let avgPriceLine: Point[] = scale.avg.map((item,index)=>{
+    const dx = 5;
+    return {
+        x: Math.floor(index * dx + scale.xMin),
+        y: Math.floor(item)
+    }
+})
+let avg = [...avgPriceLine,...avgPriceLine]
+
 //
 // console.log(currentLine);
 // console.log('layout:',s1);
@@ -96,7 +99,7 @@ let s3 = new LayOut({x: x3.top, y:y3.top },{ x:x3.right, y: y3.right }, { x: x3.
 // const grid1 = new Grid(s1, 20*dpr ,new Date('2017-10-20 09:30'),new Date('2017-10-20 15:00'));
 // const grid2 = new Grid(s2, 120*dpr, 20*dpr);
 
-const grid1 = new Grid(s1, [0, 30, 30, 30,30,30,30,30,30],50*dpr);
+const grid1 = new Grid(s1, [0, 30, 30, 30,30,30,30,30,30],30*dpr);
 const grid3 = new Grid(s1, [0, 30, 30, 30, 30, 30, 30, 30, 30],30*dpr);
 const grid2 = new Grid(s2, [0, 30, 30, 30,30,30,30,30,30],25*dpr);
 // const grid3 = new Grid(s3, [0, 240],30);
@@ -104,6 +107,9 @@ const grid2 = new Grid(s2, [0, 30, 30, 30,30,30,30,30,30],25*dpr);
 console.log('grid:',grid1);
 grid1.drawLine(ctx);
 grid2.drawLine(ctx);
+grid1.drawLabel(ctx);
+
+
 // grid1.drawYline(ctx);
 // grid2.drawXline(ctx);
 // grid2.drawYline(ctx);
@@ -154,31 +160,31 @@ grid2.drawLine(ctx);
 // })
 // ctx.restore();
 //
-// ctx.save()
-// ctx.beginPath();
-// ctx.strokeStyle = '#09f';
-// ctx.lineWidth = 2;
-// ctx.lineCap = "round";
-// console.log(currentLine[0]);
-// Utils.moveTo(ctx, currentLine[0]);
-// currentLine.map(point => Utils.lineTo(ctx, point))
-// ctx.stroke();
-// ctx.restore();
-// ctx.save();
+ctx.save()
+ctx.beginPath();
+ctx.strokeStyle = '#09f';
+ctx.lineWidth = 2;
+ctx.lineCap = "round";
+console.log(currentLine[0]);
+Utils.moveTo(ctx, currentLine[0]);
+currentLine.map(point => Utils.lineTo(ctx, point))
+ctx.stroke();
+ctx.restore();
+ctx.save();
 //
 //
 //
 //
-// ctx.beginPath();
-// ctx.strokeStyle = '#f90';
-// ctx.lineCap = "round";
-// ctx.lineWidth = 2;
-//
-// console.log(avgPriceLine[0]);
-// Utils.moveTo(ctx, avgPriceLine[0]);
-// avgPriceLine.map(point => Utils.lineTo(ctx, point))
-// ctx.stroke();
-// ctx.restore();
+ctx.beginPath();
+ctx.strokeStyle = '#f90';
+ctx.lineCap = "round";
+ctx.lineWidth = 2;
+
+console.log(avgPriceLine[0]);
+Utils.moveTo(ctx, avgPriceLine[0]);
+avgPriceLine.map(point => Utils.lineTo(ctx, point))
+ctx.stroke();
+ctx.restore();
 //
 // ctx.save();
 // (<any>window).ctx=ctx;
