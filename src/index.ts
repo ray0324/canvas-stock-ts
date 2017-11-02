@@ -35,10 +35,10 @@ canvas.height= height*dpr;
 // ctx.scale(dpr,dpr);
 
 const x1 = {
-    top: padding*dpr+45,
-    right: (width - padding)*dpr-45,
-    bottom: (width - padding)*dpr-45,
-    left: padding*dpr+45,
+    top: padding*dpr+60,
+    right: (width - padding)*dpr-60,
+    bottom: (width - padding)*dpr-60,
+    left: padding*dpr+60,
 }
 
 const y1 = {
@@ -73,19 +73,21 @@ let s3 = new LayOut({x: x3.top, y:y3.top },{ x:x3.right, y: y3.right }, { x: x3.
 
 
 let scale = new Scale(s1, root.chartlist);
-//
+
 let currentLine: Point[] = scale.y.map((item,index)=>{
-    const dx = 5;
     return {
-        x: Math.floor(index * dx + scale.xMin),
+        x: Math.floor(index / (30+30+30+30+30+30+30+30) * 2460 + scale.xMin),
         y: Math.floor(item)
     }
 })
-//
+
 let avgPriceLine: Point[] = scale.avg.map((item,index)=>{
-    const dx = 5;
+   if( index % (240 / 2) === 0 ){
+     index =  index - 1;
+     console.log(index)
+   }
     return {
-        x: Math.floor(index * dx + scale.xMin),
+        x: Math.floor(index / (30+30+30+30+30+30+30+30) * 2460 + scale.xMin),
         y: Math.floor(item)
     }
 })
@@ -99,9 +101,9 @@ let avg = [...avgPriceLine,...avgPriceLine]
 // const grid1 = new Grid(s1, 20*dpr ,new Date('2017-10-20 09:30'),new Date('2017-10-20 15:00'));
 // const grid2 = new Grid(s2, 120*dpr, 20*dpr);
 
-const grid1 = new Grid(s1, [0, 30, 30, 30,30,30,30,30,30],30*dpr);
-const grid3 = new Grid(s1, [0, 30, 30, 30, 30, 30, 30, 30, 30],30*dpr);
-const grid2 = new Grid(s2, [0, 30, 30, 30,30,30,30,30,30],25*dpr);
+const grid1 = new Grid(s1, [0, 30, 30, 30,30,0,30,30,30,30],30*dpr);
+const grid3 = new Grid(s1, [0, 30, 30, 30, 30,0, 30, 30, 30, 30],30*dpr);
+const grid2 = new Grid(s2, [0, 30, 30, 30,30,0,30,30,30,30],25*dpr);
 // const grid3 = new Grid(s3, [0, 240],30);
 
 console.log('grid:',grid1);
@@ -163,7 +165,7 @@ grid1.drawLabel(ctx);
 ctx.save()
 ctx.beginPath();
 ctx.strokeStyle = '#09f';
-ctx.lineWidth = 2;
+ctx.lineWidth = 1;
 ctx.lineCap = "round";
 console.log(currentLine[0]);
 Utils.moveTo(ctx, currentLine[0]);
@@ -171,14 +173,11 @@ currentLine.map(point => Utils.lineTo(ctx, point))
 ctx.stroke();
 ctx.restore();
 ctx.save();
-//
-//
-//
-//
+
 ctx.beginPath();
 ctx.strokeStyle = '#f90';
 ctx.lineCap = "round";
-ctx.lineWidth = 2;
+ctx.lineWidth = 1;
 
 console.log(avgPriceLine[0]);
 Utils.moveTo(ctx, avgPriceLine[0]);

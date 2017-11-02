@@ -22,7 +22,7 @@ export default class Grid {
   private yGridGutterAmount:number;
 
   // x 轴单位长度（像素）
-  public xUnit:number;
+  // public xUnit:number;
   // y轴中格子线间距
   public yGridGutter:number;
 
@@ -55,7 +55,7 @@ export default class Grid {
     this.yGridGutter = yGridGutter;
 
     // x轴最小的单位
-    this.xUnit = this.getXUnit();
+    // this.xUnit = this.getXUnit();
     // y轴轴线数量
     this.yGridGutterAmount = this.getYGridGutterAmount();
     // 获取垂直于x轴的网格线
@@ -94,17 +94,33 @@ export default class Grid {
 
   // 计算垂直于x轴线的线段集合
   private getXgridLine() {
-    let i:number = 0,x:number = this.left.x;
-    while(i<this.xGutterGroup.length) {
-      x+=this.xGutterGroup[i]*this.xUnit;
-      this.xGridLines.push({
-        start: {x: Math.round(x),y: this.bottom.y},
-        end: {x: Math.round(x),y: this.top.y}
-      });
-      this.xGridStartPoints.push({x: Math.round(x),y: this.bottom.y});
-      this.xGridEndPoints.push({x: Math.round(x),y: this.top.y});
-      i++;
-    }
+
+    let len = this.xGutterGroup.reduce((prev, cur)=>prev+cur);
+
+    this.xGutterGroup.reduce((prev,cur) => {
+      let start:Point = {
+        x: (prev+cur)/len * this.width + this.left.x,
+        y: this.bottom.y
+      }
+      let end:Point = {
+        x: (prev+cur)/len * this.width + this.left.x,
+        y: this.top.y
+      }
+      this.xGridLines.push({ start,end });
+      this.xGridStartPoints.push(start);
+      this.xGridEndPoints.push(end);
+      return prev+cur;
+    },0)
+    // while(i<this.xGutterGroup.length) {
+    //   x+=this.xGutterGroup[i]*this.xUnit;
+    //   this.xGridLines.push({
+    //     start: {x: Math.round(x),y: this.bottom.y},
+    //     end: {x: Math.round(x),y: this.top.y}
+    //   });
+      // this.xGridStartPoints.push({x: Math.round(x),y: this.bottom.y});
+      // this.xGridEndPoints.push({x: Math.round(x),y: this.top.y});
+    //   i++;
+    // }
   }
 
   //计算垂直于y轴的线段集合
@@ -142,10 +158,10 @@ export default class Grid {
   public drawLabel(ctx:CanvasRenderingContext2D) {
     ctx.save();
     ctx.fillStyle='rgba(255,255,255,.5)';
-    ctx.font='200 12px Consolas';
+    ctx.font='200 18px Consolas';
     ctx.textAlign='center';
     this.xGridStartPoints.map((point,index)=>{
-      const time = ['09:30','10:00','10:30','11:00','11:30/13:00','13:30','14:00','14:30','15:00']
+      const time = ['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00']
       ctx.fillText(time[index],point.x,point.y+15)
     })
     ctx.textAlign='right';
