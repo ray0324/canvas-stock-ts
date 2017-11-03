@@ -23,11 +23,10 @@ export default class Grid {
 
   // x轴线的分布情况
   private xGutterGroup:Array<number>;
-
+  // y轴格线数量
+  private yGridGutterAmount:number;
   // y轴中格子线间距
   public yGridGutter:number;
-  // y中点
-  public midleY:number;
 
   // 所有网格的x轴坐标
   public x:number[] = [];
@@ -44,11 +43,8 @@ export default class Grid {
     this.xGutterGroup = xGutterGroup;
     // y轴相邻两条线的间距
     this.yGridGutter = yGridGutter;
-
     // x轴刻度数量
     this.tick_amount = this.getTickAmount();
-
-    this.midleY = this.top.y + this.height / 2;
     // 获取所有数据点的x坐标
     this.getX();
     // 获取垂直于x轴的网格线
@@ -124,7 +120,7 @@ export default class Grid {
   }
 
   // 绘制标尺
-  public drawLabel(ctx:CanvasRenderingContext2D,yMax:number,open:number) {
+  public drawLabel(ctx:CanvasRenderingContext2D) {
     ctx.save();
 
     // 绘制x轴坐标位置
@@ -148,14 +144,9 @@ export default class Grid {
       }else{
         ctx.fillStyle='rgba(255,255,255,.5)';
       }
-
-      let y1 = (center - y) * yMax * 2 / this.height + open;
-
-      let y2 =  (yMax / open) * (center - y) * 2 / this.height * 100;
-
-      ctx.fillText(y1.toFixed(3),this.top.x - 5, y);
+      ctx.fillText((center - y).toFixed(0),this.top.x - 5, y);
       ctx.textAlign='left';
-      ctx.fillText( y2.toFixed(1)+'%',this.top.x + this.width + 5, y);
+      ctx.fillText((center -y).toFixed(0),this.top.x + this.width + 5, y);
     })
 
     ctx.restore();

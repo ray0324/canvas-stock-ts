@@ -1,37 +1,30 @@
 import { Point, Line } from './types';
-
-interface Pen {
-    moveTo(ctx: CanvasRenderingContext2D, p: Point):void,
-    lineTo(ctx: CanvasRenderingContext2D, p: Point):void,
-    line(ctx: CanvasRenderingContext2D, line: Line):void,
-}
-
-export class Painter implements Pen {
+export default class Painter {
 
     /**
      * moveTo 移动到指定的点
-     * @param ctx 
-     * @param p 
+     * @param {CanvasRenderingContext2D} ctx  绘制上下文
+     * @param {Point} 目标点
      */
-    public moveTo(ctx: CanvasRenderingContext2D, p: Point):void {
+    static moveTo(ctx: CanvasRenderingContext2D, p: Point):void {
         ctx.moveTo(p.x - .5, p.y - .5);
     }
 
     /**
-     * lineTo 绘制到指定的点
-     * @param ctx
-     * @param p 
+     * moveTo 移动到指定的点
+     * @param {CanvasRenderingContext2D} ctx  绘制上下文
+     * @param {Point} 目标点
      */
-    public lineTo(ctx: CanvasRenderingContext2D, p: Point):void {
+    static lineTo(ctx: CanvasRenderingContext2D, p: Point):void {
         ctx.lineTo(p.x - .5, p.y - .5);
     }
 
     /**
-     * line 绘制指定的线条
-     * @param ctx 
-     * @param line 
+     * moveTo 移动到指定的点
+     * @param {CanvasRenderingContext2D} ctx  绘制上下文
+     * @param {Line} line 线条
      */
-    public line(ctx: CanvasRenderingContext2D, line: Line):void {
+    static line(ctx: CanvasRenderingContext2D, line: Line):void {
         this.moveTo(ctx, line.start);
         this.lineTo(ctx, line.end);
     }
