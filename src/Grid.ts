@@ -2,7 +2,8 @@ import { Point, Line } from './types';
 import LayOut from './Layout';
 import * as Utils from './Utils';
 import Painter from './Painter'
-type Label = { pos:Point,val:number };
+
+import {dpr} from './config';
 
 /**
  * 构建绘图网格类型
@@ -26,29 +27,40 @@ export default class Grid {
 
   // y轴中格子线间距
   public yGridGutter:number;
-  // y中点
-  public midleY:number;
+
+  // 坐标系原点
+  public origin:Point;
+
+  public scale:number;
+  public base:number;
 
   // 所有网格的x轴坐标
   public x:number[] = [];
 
   // 构造
-  constructor(layout: LayOut,xGutterGroup:Array<number>,yGridGutter:number) {
+  constructor(param:any) {
+    // console.log(param)
     // 边界点
-    this.top = { ...layout.top };
+    this.top = param.top;
 
-    this.width = layout.width;
-    this.height = layout.height;
+    this.width = param.width;
+    this.height = param.height;
 
     // x轴线 网格格线分布情况
-    this.xGutterGroup = xGutterGroup;
+    this.xGutterGroup = param.ticks;
     // y轴相邻两条线的间距
-    this.yGridGutter = yGridGutter;
+    this.yGridGutter = param.gutter;
 
     // x轴刻度数量
     this.tick_amount = this.getTickAmount();
 
-    this.midleY = this.top.y + this.height / 2;
+    // 原点
+    this.origin = {
+      x: this.top.x,
+      y: param.scale.origin + this.top.y
+    }
+    this.scale = param.scale.scale;
+    this.base = param.scale.base;
     // 获取所有数据点的x坐标
     this.getX();
     // 获取垂直于x轴的网格线
@@ -71,32 +83,31 @@ export default class Grid {
     },0);
   }
 
-  //计算垂直于y轴的线段集合
   private getHorizontalGrid() {
-    let height = this.height;
-    let ry:number = (this.height % (this.yGridGutter * 2)) / 2;
-    let dy:number = this.yGridGutter;
-    // 起点
-    this.horizontalGrid.push(this.top.y + height);
+    let dy = this.yGridGutter;
+    if(dy<=0) {
+      throw new Error('Param Error.');
+    }
+    let y0 = this.origin.y;
+    let y1 = this.top.y;
+    let y2 = this.top.y+this.height;
+    let bdy = Math.max(Math.abs(y0-y1),Math.abs(y2-y0));
 
-    if(ry !== 0) {
-      height = height- ry;
-      this.horizontalGrid.push(this.top.y + height);
+
+    this.horizontalGrid.push(this.origin.y);
+
+    for(let dh =dy;dh<bdy;dh += dy) {
+      y0+dh < y2 && this.horizontalGrid.push(y0+dh);
+      y0-dh > y1 && this.horizontalGrid.push(y0-dh);
     }
 
-    while(height > dy) {
-      height = height-dy;
-      this.horizontalGrid.push(this.top.y + height);
-    }
-
-    // 终点
-    this.horizontalGrid.push(this.top.y);
-
+    // y0 !== y1 && this.horizontalGrid.push(y1);
+    // y0 !== y2 && this.horizontalGrid.push(y2);
   }
 
   private getX() {
     for(let i = 0; i<= this.tick_amount;i++){
-      this.x.push(this.top.x+ this.width*i/this.tick_amount)
+      this.x.push(this.origin.x+ this.width*i/this.tick_amount)
     }
   }
 
@@ -109,12 +120,15 @@ export default class Grid {
       Painter.moveTo(ctx,{ x,y:this.top.y + this.height });
       Painter.lineTo(ctx,{ x,y:this.top.y });
     })
-
-
+    Painter.moveTo(ctx,{ x:this.top.x,y:this.top.y});
+    Painter.lineTo(ctx,{ x:this.top.x+this.width,y:this.top.y });
     this.horizontalGrid.map(y=>{
       Painter.moveTo(ctx,{ x:this.top.x,y});
       Painter.lineTo(ctx,{ x:this.top.x+this.width,y});
     })
+
+    Painter.moveTo(ctx,{ x:this.top.x,y:this.top.y+this.height});
+    Painter.lineTo(ctx,{ x:this.top.x+this.width,y:this.top.y+this.height });
 
     ctx.strokeStyle = 'rgba(255,255,255,.2)';
     ctx.lineWidth = 0.5;
@@ -123,41 +137,56 @@ export default class Grid {
     ctx.restore();
   }
 
-  // 绘制标尺
-  public drawLabel(ctx:CanvasRenderingContext2D,yMax:number,open:number) {
+  // x轴线 绘制
+  public drawBottomLabel(ctx:CanvasRenderingContext2D) {
     ctx.save();
-
-    // 绘制x轴坐标位置
     ctx.fillStyle='rgba(255,255,255,.5)';
-    ctx.font='200 12px Consolas';
+    ctx.font=`200 ${10 * dpr}px Menlo`;
     ctx.textAlign='center';
     const time = ['09:30','10:00','10:30','11:00','11:30/13:00','13:30','14:00','14:30','15:00']
     this.verticalGrid.map((x,i)=>{
-        ctx.fillText(time[i],x,this.top.y+this.height+15);
-    })
+        ctx.fillText(time[i],x,this.top.y+this.height+15*dpr);
+    });
+    ctx.restore();
+  }
 
-    // 绘制y轴
-    ctx.textAlign='right';
-    let center = this.top.y+this.height / 2 ;
+  public drawLeftLabel(ctx:CanvasRenderingContext2D,digits:number) {
     this.horizontalGrid.forEach((y,i)=>{
+      let dy = this.origin.y - y;
+      let label = dy / this.scale + this.base;
+      if(dy>0) {
+        ctx.fillStyle='#fc2f4d'
+      }else if( dy<0){
+        ctx.fillStyle='#39c77d';
+      }else{
+        ctx.fillStyle='rgba(255,255,255,.5)';
+      }
       ctx.textAlign='right';
-      if(y < center) {
-        ctx.fillStyle='#df3d3d'
-      }else if( y > center){
-        ctx.fillStyle='#18c346';
+      ctx.fillText(label.toFixed(digits),this.top.x - 5*dpr, y);
+    })
+  }
+
+  public drawRigtLabel(ctx:CanvasRenderingContext2D,digits:number) {
+    ctx.fillStyle='rgba(255,255,255,.5)';
+    ctx.font=`200 ${10 * dpr}px Menlo`;
+    this.horizontalGrid.forEach((y,i)=>{
+
+      let dy = this.origin.y - y;
+      let label = dy / this.scale + this.base;
+      let percent = `${(dy/this.scale / this.base * 100).toFixed(digits)}%`;
+
+      if(dy>0) {
+        ctx.fillStyle='#fc2f4d'
+      }else if( dy<0){
+        ctx.fillStyle='#39c77d';
       }else{
         ctx.fillStyle='rgba(255,255,255,.5)';
       }
 
-      let y1 = (center - y) * yMax * 2 / this.height + open;
-
-      let y2 =  (yMax / open) * (center - y) * 2 / this.height * 100;
-
-      ctx.fillText(y1.toFixed(3),this.top.x - 5, y);
       ctx.textAlign='left';
-      ctx.fillText( y2.toFixed(1)+'%',this.top.x + this.width + 5, y);
-    })
+      ctx.fillText(percent,this.top.x + this.width + 5*dpr, y);
 
-    ctx.restore();
+    })
   }
+
 }

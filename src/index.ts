@@ -1,13 +1,12 @@
 import { override } from 'core-decorators';
-import { Point } from './types';
+import { Point,Line } from './types';
 import Grid from './Grid';
 import LayOut from './Layout';
 import * as Utils from './Utils';
 import * as stocklist_1d from '../mock/stocklist_1d.json';
-import Scale from './Scale';
+import { Scale } from './Scale';
 
 const root = <any>stocklist_1d;
-
 console.log(root)
 
 // 像素密度
@@ -21,7 +20,7 @@ const padding: number = 5;
 const width: number = 1300;
 const height: number = 540;
 const masterHeight: number = 350;
-const gutter: number = 30;
+const gutter: number = 2;
 
 // 初始化
 canvas.style.width=`${width}px`;
@@ -35,23 +34,21 @@ canvas.height= height*dpr;
 // ctx.scale(dpr,dpr);
 
 const x1 = {
-    top: padding*dpr+60,
-    right: (width - padding)*dpr-60,
-    bottom: (width - padding)*dpr-60,
-    left: padding*dpr+60,
+    top: padding*dpr+60*dpr,
+    right: (width - padding)*dpr-60*dpr,
+    bottom: (width - padding)*dpr-60*dpr,
+    left: padding*dpr+60*dpr,
 }
 
 const y1 = {
-    top: padding*dpr+15,
-    right: padding*dpr+15,
-    bottom: (masterHeight + padding)*dpr-15,
-    left: (masterHeight + padding)*dpr-15,
+    top: padding*dpr+15*dpr,
+    right: padding*dpr+15*dpr,
+    bottom: (masterHeight + padding)*dpr-15*dpr,
+    left: (masterHeight + padding)*dpr-15*dpr,
 }
 
 const x2 = x1;
 const x3 = x1;
-
-
 
 const y2 = {
     top: (masterHeight + padding * 2 + gutter)*dpr,
@@ -67,62 +64,160 @@ const y3 = {
     left: (masterHeight + padding + gutter)*dpr,
 }
 
-let s1 = new LayOut({x: x1.top, y:y1.top },{ x:x1.right, y: y1.right }, { x: x1.bottom,y: y1.bottom },{x: x1.left,y:y1.left });
-let s2 = new LayOut({x: x2.top, y:y2.top },{ x:x2.right, y: y2.right }, { x: x2.bottom,y: y2.bottom },{x: x2.left,y:y2.left });
-let s3 = new LayOut({x: x3.top, y:y3.top },{ x:x3.right, y: y3.right }, { x: x3.bottom,y: y3.bottom },{x: x3.left,y:y3.left });
+let cur:number[] = [];
+let avg:number[] = [];
+let vol:number[] = [];
 
-const grid1 = new Grid(s1, [0, 30, 30, 30,30,30,30,30,30],20*dpr);
+// 昨日收盘价格
+let last_close:number = 42.26;
+
+root.chartlist.map((item:any)=>{
+  cur.push(item.current);
+  avg.push(item.avg_price);
+  vol.push(item.volume);
+})
+
+let scale1 = Scale.dynamiclyCalcOriginAndScale(cur,last_close,320*dpr);
+let scale2 = Scale.dynamiclyCalcOriginAndScale(vol,0,160*dpr);
+
+const grid1 = new Grid({
+  scale: scale1,
+  width: 1170 * dpr,
+  height: 320 * dpr,
+  gutter: 20 * dpr,
+  ticks: [0, 30, 30, 30, 30, 30, 30, 30, 30],
+  top: { x:x1.top, y:y1.top }
+})
+
+const grid2 = new Grid({
+  scale: scale2,
+  width: 1170 * dpr,
+  height: 160 * dpr,
+  gutter: 20 * dpr,
+  ticks: [0, 30, 30, 30, 30, 30, 30, 30, 30],
+  top: { x:x1.top, y:y2.top+20 }
+})
 
 console.log(grid1)
+console.log(grid2)
+
 grid1.drawGrid(ctx);
+grid1.drawRigtLabel(ctx,2);
+grid1.drawLeftLabel(ctx,2);
+grid1.drawBottomLabel(ctx);
+
+grid2.drawGrid(ctx);
+grid2.drawLeftLabel(ctx,0);
 
 
-let scale1 = new Scale(grid1,root.chartlist);
+let p1:Point[] = cur.map((price:number,index:number)=>{
+  return {
+    x:Math.floor(grid1.x[index]),
+    y: scale1.origin - (price - grid1.base) * scale1.scale + grid1.top.y
+  }
+})
 
-grid1.drawLabel(ctx, scale1.yOffsetMax,scale1.open);
+let p2:Point[] = avg.map((price:number,index:number)=>{
+  return {
+    x:Math.floor(grid1.x[index]),
+    y: scale1.origin - (price - grid1.base) * scale1.scale + grid1.top.y
+  }
+})
+
+let p3:Point[] = vol.map((price:number,index:number)=>{
+  return {
+    x:Math.floor(grid2.x[index]),
+    y: scale2.origin - (price - grid2.base) * scale2.scale + grid2.top.y
+  };
+})
+
+let l3:Line[] = vol.map((price:number,index:number)=>{
+  let end = {
+    x:Math.floor(grid2.x[index]),
+    y: scale2.origin - (price - grid2.base) * scale2.scale + grid2.top.y
+  };
+  let start = {
+    x:Math.floor(grid2.x[index]),
+    y:grid2.top.y+grid2.height
+  }
+  return {start, end}
+})
 
 
-console.log(scale1);
-let price = scale1.y;
+l3.pop();
+drawLine(ctx,p1,'#09f');
+drawLine(ctx,p2,'#f90');
+drawBar(ctx,l3,'#fc2f4d');
+// drawLine(ctx,p3,'#f90');
+
+console.log(l3)
+
+function drawLine(ctx:CanvasRenderingContext2D,points:Point[],color:string) {
+  ctx.save()
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = "round";
+
+  Utils.moveTo(ctx, points[0]);
+  points.map(point => Utils.lineTo(ctx, point))
+  ctx.stroke();
+  ctx.restore();
+  ctx.save();
+}
 
 
-let currentLine: Point[] = scale1.y.map((y,i)=>{
-    return {
-      x:Math.floor(grid1.x[i]),
-      y:Math.floor(y)
-    }
-});
-currentLine.pop();
-console.log(currentLine);
+function drawBar(ctx:CanvasRenderingContext2D,lines:Line[],color:string) {
+  ctx.save()
+  ctx.beginPath();
+  // ctx.strokeStyle = color;
+  ctx.lineWidth = 5;
+  // ctx.lineCap = "round";
 
-let avgPriceLine: Point[] = scale1.y2.map((y,i)=>{
-    return {
-      x:Math.floor(grid1.x[i]),
-      y:Math.floor(y)
-    }
-});
-currentLine.pop();
-console.log(avgPriceLine);
+  lines.map(line => {
+    ctx.beginPath();
+    ctx.strokeStyle = Math.random() > 0.5 ? '#fc2f4d':'#39c77d';
+    Utils.line(ctx, line);
+    ctx.stroke();
+  })
 
-ctx.save()
-ctx.beginPath();
-ctx.strokeStyle = '#09f';
-ctx.lineWidth = 1;
-ctx.lineCap = "round";
-console.log(currentLine[0]);
-Utils.moveTo(ctx, currentLine[0]);
-currentLine.map(point => Utils.lineTo(ctx, point))
-ctx.stroke();
-ctx.restore();
-ctx.save();
+  ctx.restore();
+}
+
+
 //
-ctx.beginPath();
-ctx.strokeStyle = '#f90';
-ctx.lineCap = "round";
-ctx.lineWidth = 1;
+// const avgPriceLine = root.chartlist.map((item:any)=>item.avg_price);
+//
+// let p2:Point[] = avgPriceLine.map((price:number,index:number)=>{
+//   return {
+//     x:Math.floor(grid1.x[index]),
+//     y: scale.origin - (price - grid1.base) * scale.scale + grid1.top.y
+//   }
+// })
 
-console.log(avgPriceLine[0]);
-Utils.moveTo(ctx, avgPriceLine[0]);
-avgPriceLine.map(point => Utils.lineTo(ctx, point))
-ctx.stroke();
-ctx.restore();
+
+// console.log(p2)
+
+//
+// ctx.save()
+// ctx.beginPath();
+// ctx.strokeStyle = '#09f';
+// ctx.lineWidth = 1.5;
+// ctx.lineCap = "round";
+//
+// Utils.moveTo(ctx, p[0]);
+// p.map(point => Utils.lineTo(ctx, point))
+// ctx.stroke();
+// ctx.restore();
+// ctx.save();
+//
+// ctx.beginPath();
+// ctx.strokeStyle = '#f90';
+// ctx.lineCap = "round";
+// ctx.lineWidth = 1.5;
+//
+// // console.log(avgPriceLine[0]);
+// Utils.moveTo(ctx, avgPriceLine[0]);
+// p2.map(point => Utils.lineTo(ctx, point))
+// ctx.stroke();
+// ctx.restore();

@@ -25,7 +25,7 @@ export default class Painter {
      * @param {Line} line 线条
      */
     static line(ctx: CanvasRenderingContext2D, line: Line):void {
-        this.moveTo(ctx, line.start);
-        this.lineTo(ctx, line.end);
+        Painter.moveTo(ctx, line.start);
+        Painter.lineTo(ctx, line.end);
     }
 }
