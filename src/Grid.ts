@@ -30,6 +30,7 @@ export default class Grid {
 
   // 坐标系原点
   public origin:Point;
+  public colors:any;
 
   public scale:number;
   public base:number;
@@ -39,12 +40,12 @@ export default class Grid {
 
   // 构造
   constructor(param:any) {
-    // console.log(param)
     // 边界点
     this.top = param.top;
 
     this.width = param.width;
     this.height = param.height;
+    this.colors = param.colors;
 
     // x轴线 网格格线分布情况
     this.xGutterGroup = param.ticks;
@@ -150,23 +151,26 @@ export default class Grid {
     ctx.restore();
   }
 
-  public drawLeftLabel(ctx:CanvasRenderingContext2D,digits:number) {
+  public drawLeftLabel(ctx:CanvasRenderingContext2D,digits:number,color?:boolean) {
     this.horizontalGrid.forEach((y,i)=>{
       let dy = this.origin.y - y;
       let label = dy / this.scale + this.base;
-      if(dy>0) {
-        ctx.fillStyle='#fc2f4d'
+      let colors = this.colors;
+      if(color){
+        ctx.fillStyle=colors.base;
+      }else if(dy>0) {
+        ctx.fillStyle=colors.rise;
       }else if( dy<0){
-        ctx.fillStyle='#39c77d';
+        ctx.fillStyle=colors.fall;
       }else{
-        ctx.fillStyle='rgba(255,255,255,.5)';
+        ctx.fillStyle=colors.base;
       }
       ctx.textAlign='right';
       ctx.fillText(label.toFixed(digits),this.top.x - 5*dpr, y);
     })
   }
 
-  public drawRigtLabel(ctx:CanvasRenderingContext2D,digits:number) {
+  public drawRigtLabel(ctx:CanvasRenderingContext2D,digits:number,color?:boolean) {
     ctx.fillStyle='rgba(255,255,255,.5)';
     ctx.font=`200 ${10 * dpr}px Menlo`;
     this.horizontalGrid.forEach((y,i)=>{
@@ -174,15 +178,16 @@ export default class Grid {
       let dy = this.origin.y - y;
       let label = dy / this.scale + this.base;
       let percent = `${(dy/this.scale / this.base * 100).toFixed(digits)}%`;
-
-      if(dy>0) {
-        ctx.fillStyle='#fc2f4d'
+      let colors = this.colors;
+      if(color){
+        ctx.fillStyle=colors.base;
+      }else if(dy>0) {
+        ctx.fillStyle=colors.rise;
       }else if( dy<0){
-        ctx.fillStyle='#39c77d';
+        ctx.fillStyle=colors.fall;
       }else{
-        ctx.fillStyle='rgba(255,255,255,.5)';
+        ctx.fillStyle=colors.base;
       }
-
       ctx.textAlign='left';
       ctx.fillText(percent,this.top.x + this.width + 5*dpr, y);
 

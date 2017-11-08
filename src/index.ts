@@ -5,12 +5,13 @@ import LayOut from './Layout';
 import * as Utils from './Utils';
 import * as stocklist_1d from '../mock/stocklist_1d.json';
 import { Scale } from './Scale';
+import {dpr} from './config';
 
 const root = <any>stocklist_1d;
 console.log(root)
 
 // 像素密度
-const dpr:number = window.devicePixelRatio;
+// const dpr:number = window.devicePixelRatio;
 const canvas:HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('canvas');
 const ctx:CanvasRenderingContext2D = <CanvasRenderingContext2D>canvas.getContext('2d');
 
@@ -64,26 +65,48 @@ const y3 = {
     left: (masterHeight + padding + gutter)*dpr,
 }
 
+const colors = {
+  base: 'rgba(255,255,255,.5)',
+  rise: '#fc2f4d',
+  fall: '#39c77d'
+}
+
 let cur:number[] = [];
 let avg:number[] = [];
-let vol:number[] = [];
+let vol:any[] = [];
 
 // 昨日收盘价格
 let last_close:number = 42.26;
 
-root.chartlist.map((item:any)=>{
-  cur.push(item.current);
-  avg.push(item.avg_price);
-  vol.push(item.volume);
-})
+root.chartlist.reduce((prev:any,next:any,index:number)=>{
+  cur.push(next.current);
+  avg.push(next.avg_price);
+  if( index === 0 ){
+    vol.push({
+      vol: next.volume,
+      color: next.current - last_close > 0 ? colors.rise : colors.fall
+    });
+  }else{
+    vol.push({
+      vol: next.volume,
+      color: next.current - prev.current > 0 ? colors.rise : colors.fall
+    });
+  }
+
+  return next;
+
+},{})
+
+console.log(vol)
 
 let scale1 = Scale.dynamiclyCalcOriginAndScale(cur,last_close,320*dpr);
-let scale2 = Scale.dynamiclyCalcOriginAndScale(vol,0,160*dpr);
+let scale2 = Scale.dynamiclyCalcOriginAndScale(vol.map(itm=>itm.vol),0,140*dpr);
 
 const grid1 = new Grid({
   scale: scale1,
   width: 1170 * dpr,
   height: 320 * dpr,
+  colors: colors,
   gutter: 20 * dpr,
   ticks: [0, 30, 30, 30, 30, 30, 30, 30, 30],
   top: { x:x1.top, y:y1.top }
@@ -92,14 +115,12 @@ const grid1 = new Grid({
 const grid2 = new Grid({
   scale: scale2,
   width: 1170 * dpr,
-  height: 160 * dpr,
+  height: 140 * dpr,
+  colors: colors,
   gutter: 20 * dpr,
   ticks: [0, 30, 30, 30, 30, 30, 30, 30, 30],
-  top: { x:x1.top, y:y2.top+20 }
+  top: { x:x1.top, y:y2.top }
 })
-
-console.log(grid1)
-console.log(grid2)
 
 grid1.drawGrid(ctx);
 grid1.drawRigtLabel(ctx,2);
@@ -107,7 +128,7 @@ grid1.drawLeftLabel(ctx,2);
 grid1.drawBottomLabel(ctx);
 
 grid2.drawGrid(ctx);
-grid2.drawLeftLabel(ctx,0);
+grid2.drawLeftLabel(ctx,0,);
 
 
 let p1:Point[] = cur.map((price:number,index:number)=>{
@@ -131,23 +152,29 @@ let p3:Point[] = vol.map((price:number,index:number)=>{
   };
 })
 
-let l3:Line[] = vol.map((price:number,index:number)=>{
+let l3:any = vol.map((item:any,index:number)=>{
   let end = {
     x:Math.floor(grid2.x[index]),
-    y: scale2.origin - (price - grid2.base) * scale2.scale + grid2.top.y
+    y: scale2.origin - (item.vol - grid2.base) * scale2.scale + grid2.top.y
   };
   let start = {
     x:Math.floor(grid2.x[index]),
     y:grid2.top.y+grid2.height
   }
-  return {start, end}
+  return {
+    line:{start, end},
+    color:item.color
+  }
 })
 
-
 l3.pop();
+
+console.log(l3)
+
 drawLine(ctx,p1,'#09f');
 drawLine(ctx,p2,'#f90');
-drawBar(ctx,l3,'#fc2f4d');
+
+drawBar(ctx, l3);
 // drawLine(ctx,p3,'#f90');
 
 console.log(l3)
@@ -167,57 +194,17 @@ function drawLine(ctx:CanvasRenderingContext2D,points:Point[],color:string) {
 }
 
 
-function drawBar(ctx:CanvasRenderingContext2D,lines:Line[],color:string) {
+function drawBar(ctx:CanvasRenderingContext2D,items:any[]) {
   ctx.save()
   ctx.beginPath();
-  // ctx.strokeStyle = color;
-  ctx.lineWidth = 5;
-  // ctx.lineCap = "round";
+  ctx.lineWidth = 2.5 * dpr;
 
-  lines.map(line => {
+  items.map(item => {
     ctx.beginPath();
-    ctx.strokeStyle = Math.random() > 0.5 ? '#fc2f4d':'#39c77d';
-    Utils.line(ctx, line);
+    ctx.strokeStyle = item.color;
+    Utils.line(ctx, item.line);
     ctx.stroke();
   })
 
   ctx.restore();
 }
-
-
-//
-// const avgPriceLine = root.chartlist.map((item:any)=>item.avg_price);
-//
-// let p2:Point[] = avgPriceLine.map((price:number,index:number)=>{
-//   return {
-//     x:Math.floor(grid1.x[index]),
-//     y: scale.origin - (price - grid1.base) * scale.scale + grid1.top.y
-//   }
-// })
-
-
-// console.log(p2)
-
-//
-// ctx.save()
-// ctx.beginPath();
-// ctx.strokeStyle = '#09f';
-// ctx.lineWidth = 1.5;
-// ctx.lineCap = "round";
-//
-// Utils.moveTo(ctx, p[0]);
-// p.map(point => Utils.lineTo(ctx, point))
-// ctx.stroke();
-// ctx.restore();
-// ctx.save();
-//
-// ctx.beginPath();
-// ctx.strokeStyle = '#f90';
-// ctx.lineCap = "round";
-// ctx.lineWidth = 1.5;
-//
-// // console.log(avgPriceLine[0]);
-// Utils.moveTo(ctx, avgPriceLine[0]);
-// p2.map(point => Utils.lineTo(ctx, point))
-// ctx.stroke();
-// ctx.restore();
