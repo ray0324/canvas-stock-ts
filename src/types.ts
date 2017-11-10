@@ -1,3 +1,5 @@
 // 定义点
 export type Point = { x: number, y: number };
-export type Line = { start: Point, end: Point }
+// 定义线条
+export type Line = { start: Point, end: Point };
+export type Line2 = [ Point, Point ];

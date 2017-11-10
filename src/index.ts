@@ -3,6 +3,7 @@ import { Point,Line } from './types';
 import Grid from './Grid';
 import LayOut from './Layout';
 import * as Utils from './Utils';
+import Painter from './Painter'
 import * as stocklist_1d from '../mock/stocklist_1d.json';
 import { Scale } from './Scale';
 import {dpr} from './config';
@@ -171,27 +172,13 @@ l3.pop();
 
 console.log(l3)
 
-drawLine(ctx,p1,'#09f');
-drawLine(ctx,p2,'#f90');
+Painter.drawPolyLine(ctx,p1,1.5,'#09f');
+Painter.drawPolyLine(ctx,p2,1.5,'#f90');
 
 drawBar(ctx, l3);
-// drawLine(ctx,p3,'#f90');
+// Painter.drawPolyLine(ctx,p3,1.5,'#f90');
+console.log(l3);
 
-console.log(l3)
-
-function drawLine(ctx:CanvasRenderingContext2D,points:Point[],color:string) {
-  ctx.save()
-  ctx.beginPath();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1.5;
-  ctx.lineCap = "round";
-
-  Utils.moveTo(ctx, points[0]);
-  points.map(point => Utils.lineTo(ctx, point))
-  ctx.stroke();
-  ctx.restore();
-  ctx.save();
-}
 
 
 function drawBar(ctx:CanvasRenderingContext2D,items:any[]) {

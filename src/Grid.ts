@@ -121,6 +121,7 @@ export default class Grid {
       Painter.moveTo(ctx,{ x,y:this.top.y + this.height });
       Painter.lineTo(ctx,{ x,y:this.top.y });
     })
+
     Painter.moveTo(ctx,{ x:this.top.x,y:this.top.y});
     Painter.lineTo(ctx,{ x:this.top.x+this.width,y:this.top.y });
     this.horizontalGrid.map(y=>{
