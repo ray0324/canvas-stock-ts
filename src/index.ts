@@ -2,7 +2,7 @@ import { override } from 'core-decorators';
 import { Point,Line } from './types';
 import Grid from './Grid';
 import LayOut from './Layout';
-import * as Utils from './Utils';
+// import * as Utils from './Utils';
 import Painter from './Painter'
 import * as stocklist_1d from '../mock/stocklist_1d.json';
 import { Scale } from './Scale';
@@ -189,7 +189,7 @@ function drawBar(ctx:CanvasRenderingContext2D,items:any[]) {
   items.map(item => {
     ctx.beginPath();
     ctx.strokeStyle = item.color;
-    Utils.line(ctx, item.line);
+    Painter.line(ctx, item.line);
     ctx.stroke();
   })
 

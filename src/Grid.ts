@@ -1,6 +1,6 @@
 import { Point, Line } from './types';
 import LayOut from './Layout';
-import * as Utils from './Utils';
+// import * as Utils from './Utils';
 import Painter from './Painter'
 
 import {dpr} from './config';
