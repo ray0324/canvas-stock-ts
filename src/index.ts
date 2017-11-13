@@ -1,9 +1,7 @@
 import { override } from 'core-decorators';
 import { Point,Line } from './types';
 import Grid from './Grid';
-import LayOut from './Layout';
-// import * as Utils from './Utils';
-import Painter from './Painter'
+import Painter from './core/Painter';
 import * as stocklist_1d from '../mock/stocklist_1d.json';
 import { Scale } from './Scale';
 import {dpr} from './config';

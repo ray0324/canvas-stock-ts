@@ -1,5 +1,5 @@
 import { Point, Line } from './types';
-import Grid from './Grid'
+// import Grid from './Grid'
 
 export class Scale {
   // 动态计算出原点和缩放比例
