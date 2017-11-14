@@ -1,4 +1,4 @@
-import { Point, Line } from './types';
+import { Point, Line } from '../types';
 export default class Painter {
 
     /**
