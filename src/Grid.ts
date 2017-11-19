@@ -1,7 +1,5 @@
 import { Point, Line } from './types';
-// import LayOut from './Layout';
-// import * as Utils from './Utils';
-import Painter from './core/Painter'
+import Painter from './core/Painter';
 
 import {dpr} from './config';
 
@@ -93,7 +91,6 @@ export default class Grid {
     let y1 = this.top.y;
     let y2 = this.top.y+this.height;
     let bdy = Math.max(Math.abs(y0-y1),Math.abs(y2-y0));
-
 
     this.horizontalGrid.push(this.origin.y);
 

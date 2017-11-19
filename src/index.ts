@@ -5,6 +5,7 @@ import Painter from './core/Painter';
 import * as stocklist_1d from '../mock/stocklist_1d.json';
 import { Scale } from './Scale';
 import {dpr} from './config';
+import windowToCanvas from './core/windowToCanvas';
 
 const root = <any>stocklist_1d;
 console.log(root)
@@ -174,10 +175,6 @@ Painter.drawPolyLine(ctx,p1,1.5,'#09f');
 Painter.drawPolyLine(ctx,p2,1.5,'#f90');
 
 drawBar(ctx, l3);
-// Painter.drawPolyLine(ctx,p3,1.5,'#f90');
-console.log(l3);
-
-
 
 function drawBar(ctx:CanvasRenderingContext2D,items:any[]) {
   ctx.save()
@@ -193,3 +190,19 @@ function drawBar(ctx:CanvasRenderingContext2D,items:any[]) {
 
   ctx.restore();
 }
+
+canvas.addEventListener('click',function(e){
+  console.log(e);
+   let p:Point = windowToCanvas(canvas,e.pageX,e.pageY);
+   ctx.save();
+   ctx.setLineDash([24,6,6,6]);
+   ctx.lineWidth = 2;
+   ctx.strokeStyle='#069';
+   Painter.moveTo(ctx, { x:0, y:p.y});
+   Painter.lineTo(ctx, { x:canvas.width, y:p.y});
+   Painter.moveTo(ctx, { x:p.x, y:0});
+   Painter.lineTo(ctx, { x:p.x, y:canvas.height});
+   ctx.stroke();
+   ctx.restore();
+   console.log(p)
+})

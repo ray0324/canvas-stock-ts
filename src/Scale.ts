@@ -6,8 +6,9 @@ export class Scale {
   static dynamiclyCalcOriginAndScale(data:number[],base:number,height:number) {
     const max = Math.max(...data,base);
     const min = Math.min(...data,base);
-    const scale = height / (max - min)*0.9;
+    const scale = height / (max - min) * 0.9;
     const origin = Math.round((max - base) / (max - min) * height);
     return {origin,scale, base};
   }
 }
+ 
