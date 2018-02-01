@@ -191,10 +191,11 @@ function drawBar(ctx: CanvasRenderingContext2D, items: any[]) {
   ctx.restore();
 }
 
-canvas.addEventListener('mousemove', function (e) {
+canvas.addEventListener('click', function (e) {
   ctx.save();
   let p: Point = windowToCanvas(canvas, e.pageX, e.pageY);
   console.log(p);
+  ctx.beginPath();
   Painter.moveTo(ctx, { x: 0, y: p.y });
   Painter.lineTo(ctx, { x: canvas.width, y: p.y });
   Painter.moveTo(ctx, { x: p.x, y: 0 });
