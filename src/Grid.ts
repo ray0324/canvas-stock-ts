@@ -1,49 +1,62 @@
 import { Point, Line } from './types';
 import Painter from './core/Painter';
 
-import {dpr} from './config';
+
+import { DPR, BASE_COLOR, RISE_COLOR, FALL_COLOR } from './config';
+
+// 全局配置文件
+
+const FONT = `200 ${12 * DPR}px Menlo`;
+const DEFAULT_LABEL_COLOR = 'rgba(255,255,255,.5)';
+const X_AXIS_TICKS = ['09:30', '10:00', '10:30', '11:00', '11:30/13:00', '13:30', '14:00', '14:30', '15:00'];
+
 
 /**
  * 构建绘图网格类型
  */
 export default class Grid {
+  static cfg = {
+    rise_color: RISE_COLOR,
+    fall_color: FALL_COLOR,
+    base_color: BASE_COLOR,
+  };
   //顶点
   public top: Point;
   // 宽度
-  public width:number;
-  public height:number;
+  public width: number;
+  public height: number;
 
   // x轴线刻度数量
-  public tick_amount:number;
+  public tick_amount: number;
 
   // 水平网格线
-  public horizontalGrid:number[] = [];
-  public verticalGrid:number[] = [];
+  public horizontalGrid: number[] = [];
+  public verticalGrid: number[] = [];
 
   // x轴线的分布情况
-  private xGutterGroup:Array<number>;
+  private xGutterGroup: Array<number>;
 
   // y轴中格子线间距
-  public yGridGutter:number;
+  public yGridGutter: number;
 
   // 坐标系原点
-  public origin:Point;
-  public colors:any;
+  public origin: Point;
+  public colors: any;
 
-  public scale:number;
-  public base:number;
+  public scale: number;
+  public base: number;
 
   // 所有网格的x轴坐标
-  public x:number[] = [];
+  public x: number[] = [];
 
   // 构造
-  constructor(param:any) {
+  constructor(param: any) {
     // 边界点
     this.top = param.top;
 
     this.width = param.width;
     this.height = param.height;
-    this.colors = param.colors;
+    // this.colors = param.colors;
 
     // x轴线 网格格线分布情况
     this.xGutterGroup = param.ticks;
@@ -58,6 +71,7 @@ export default class Grid {
       x: this.top.x,
       y: param.scale.origin + this.top.y
     }
+
     this.scale = param.scale.scale;
     this.base = param.scale.base;
     // 获取所有数据点的x坐标
@@ -70,125 +84,122 @@ export default class Grid {
 
   // 获取x轴上总刻度数(含原点)
   private getTickAmount() {
-    return this.xGutterGroup.reduce((prev, cur)=>prev+cur);
+    return this.xGutterGroup.reduce((prev, cur) => prev + cur);
   }
 
   // 计算垂直于x轴线的线段集合
   private getVerticalGrid() {
-    this.xGutterGroup.reduce((prev,cur) => {
+    this.xGutterGroup.reduce((prev, cur) => {
       let x = Math.round((prev + cur) / this.tick_amount * this.width + this.top.x);
       this.verticalGrid.push(x);
-      return prev+cur;
-    },0);
+      return prev + cur;
+    }, 0);
   }
 
   private getHorizontalGrid() {
     let dy = this.yGridGutter;
-    if(dy<=0) {
+    if (dy <= 0) {
       throw new Error('Param Error.');
     }
     let y0 = this.origin.y;
     let y1 = this.top.y;
-    let y2 = this.top.y+this.height;
-    let bdy = Math.max(Math.abs(y0-y1),Math.abs(y2-y0));
+    let y2 = this.top.y + this.height;
+    let bdy = Math.max(Math.abs(y0 - y1), Math.abs(y2 - y0));
 
     this.horizontalGrid.push(this.origin.y);
 
-    for(let dh =dy;dh<bdy;dh += dy) {
-      y0+dh < y2 && this.horizontalGrid.push(y0+dh);
-      y0-dh > y1 && this.horizontalGrid.push(y0-dh);
+    for (let dh = dy; dh < bdy; dh += dy) {
+      y0 + dh < y2 && this.horizontalGrid.push(y0 + dh);
+      y0 - dh > y1 && this.horizontalGrid.push(y0 - dh);
     }
-
-    // y0 !== y1 && this.horizontalGrid.push(y1);
-    // y0 !== y2 && this.horizontalGrid.push(y2);
   }
 
   private getX() {
-    for(let i = 0; i<= this.tick_amount;i++){
-      this.x.push(this.origin.x+ this.width*i/this.tick_amount)
+    for (let i = 0; i <= this.tick_amount; i++) {
+      this.x.push(this.origin.x + this.width * i / this.tick_amount)
     }
   }
 
   // 绘制网格线
-  public drawGrid(ctx:CanvasRenderingContext2D) {
+  public drawGrid(ctx: CanvasRenderingContext2D) {
     ctx.save();
     ctx.beginPath();
 
-    this.verticalGrid.map(x=>{
-      Painter.moveTo(ctx,{ x,y:this.top.y + this.height });
-      Painter.lineTo(ctx,{ x,y:this.top.y });
+    this.verticalGrid.map(x => {
+      Painter.moveTo(ctx, { x, y: this.top.y + this.height });
+      Painter.lineTo(ctx, { x, y: this.top.y });
     })
 
-    Painter.moveTo(ctx,{ x:this.top.x,y:this.top.y});
-    Painter.lineTo(ctx,{ x:this.top.x+this.width,y:this.top.y });
+    Painter.moveTo(ctx, { x: this.top.x, y: this.top.y });
+    Painter.lineTo(ctx, { x: this.top.x + this.width, y: this.top.y });
 
-    this.horizontalGrid.map(y=>{
-      Painter.moveTo(ctx,{ x:this.top.x,y});
-      Painter.lineTo(ctx,{ x:this.top.x+this.width,y});
+    this.horizontalGrid.map(y => {
+      Painter.moveTo(ctx, { x: this.top.x, y });
+      Painter.lineTo(ctx, { x: this.top.x + this.width, y });
     })
 
-    Painter.moveTo(ctx,{ x:this.top.x,y:this.top.y+this.height});
-    Painter.lineTo(ctx,{ x:this.top.x+this.width,y:this.top.y+this.height });
+    Painter.moveTo(ctx, { x: this.top.x, y: this.top.y + this.height });
+    Painter.lineTo(ctx, { x: this.top.x + this.width, y: this.top.y + this.height });
 
-    ctx.strokeStyle = 'rgba(255,255,255,.2)';
-    ctx.lineWidth = 0.5;
+    ctx.strokeStyle = 'rgba(255,255,255,.1)';
+    ctx.lineWidth = 1;
 
     ctx.stroke();
     ctx.restore();
   }
 
   // x轴线 绘制
-  public drawBottomLabel(ctx:CanvasRenderingContext2D) {
+  public drawBottomLabel(ctx: CanvasRenderingContext2D) {
     ctx.save();
-    ctx.fillStyle='rgba(255,255,255,.5)';
-    ctx.font=`200 ${10 * dpr}px Menlo`;
-    ctx.textAlign='center';
-    const time = ['09:30','10:00','10:30','11:00','11:30/13:00','13:30','14:00','14:30','15:00']
-    this.verticalGrid.map((x,i)=>{
-        ctx.fillText(time[i],x,this.top.y+this.height+15*dpr);
+    ctx.fillStyle = 'rgba(255,255,255,.5)';
+    ctx.font = `200 ${12 * DPR}px Menlo`;
+    ctx.textAlign = 'center';
+    const time = X_AXIS_TICKS;
+    this.verticalGrid.map((x, i) => {
+      ctx.fillText(time[i], x, this.top.y + this.height + 15 * DPR);
     });
     ctx.restore();
   }
 
-  public drawLeftLabel(ctx:CanvasRenderingContext2D,digits:number,color?:boolean) {
-    this.horizontalGrid.forEach((y,i)=>{
+  public drawLeftLabel(ctx: CanvasRenderingContext2D, digits: number, color?: boolean) {
+    this.horizontalGrid.forEach((y, i) => {
       let dy = this.origin.y - y;
       let label = dy / this.scale + this.base;
       let colors = this.colors;
-      if(color){
-        ctx.fillStyle=colors.base;
-      }else if(dy>0) {
-        ctx.fillStyle=colors.rise;
-      }else if( dy<0){
-        ctx.fillStyle=colors.fall;
-      }else{
-        ctx.fillStyle=colors.base;
+      if (color) {
+        ctx.fillStyle = BASE_COLOR;
+      } else if (dy > 0) {
+        ctx.fillStyle = RISE_COLOR;
+      } else if (dy < 0) {
+        ctx.fillStyle = FALL_COLOR;
+      } else {
+        ctx.fillStyle = BASE_COLOR;
       }
-      ctx.textAlign='right';
-      ctx.fillText(label.toFixed(digits),this.top.x - 5*dpr, y);
+      ctx.textAlign = 'right';
+      ctx.fillText(label.toFixed(digits), this.top.x - 5 * DPR, y);
     })
   }
 
-  public drawRigtLabel(ctx:CanvasRenderingContext2D,digits:number,color?:boolean) {
-    ctx.fillStyle='rgba(255,255,255,.5)';
-    ctx.font=`200 ${10 * dpr}px Menlo`;
-    this.horizontalGrid.forEach((y,i)=>{
+  public drawRigtLabel(ctx: CanvasRenderingContext2D, digits: number, color?: boolean) {
+    ctx.fillStyle = 'rgba(255,255,255,.5)';
+    ctx.font = FONT;
+    this.horizontalGrid.forEach((y, i) => {
 
       let dy = this.origin.y - y;
       let label = dy / this.scale + this.base;
-      let percent = `${(dy/this.scale / this.base * 100).toFixed(digits)}%`;
+      let percent = `${(dy / this.scale / this.base * 100).toFixed(digits)}%`;
       let colors = this.colors;
-      if(color){
-        ctx.fillStyle=colors.base;
-      }else if(dy>0) {
-        ctx.fillStyle=colors.rise;
-      }else if( dy<0){
-        ctx.fillStyle=colors.fall;
-      }else{
-        ctx.fillStyle=colors.base;
+      if (color) {
+        ctx.fillStyle = BASE_COLOR;
+      } else if (dy > 0) {
+        ctx.fillStyle = RISE_COLOR;
+      } else if (dy < 0) {
+        ctx.fillStyle = FALL_COLOR;
+      } else {
+        ctx.fillStyle = BASE_COLOR;
       }
-      ctx.textAlign='left';
-      ctx.fillText(percent,this.top.x + this.width + 5*dpr, y);
+      ctx.textAlign = 'left';
+      ctx.fillText(percent, this.top.x + this.width + 5 * DPR, y);
 
     })
   }

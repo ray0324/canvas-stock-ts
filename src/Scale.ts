@@ -1,5 +1,4 @@
 import { Point, Line } from './types';
-// import Grid from './Grid'
 
 export class Scale {
   // 动态计算出原点和缩放比例
@@ -8,6 +7,7 @@ export class Scale {
     const min = Math.min(...data,base);
     const scale = height / (max - min) * 0.9;
     const origin = Math.round((max - base) / (max - min) * height);
+    // const origin = Math.round(1/2 * height);
     return {origin,scale, base};
   }
 }
