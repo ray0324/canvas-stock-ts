@@ -8,7 +8,6 @@ import windowToCanvas from './core/windowToCanvas';
 import { cur, avg, vol, last_close } from './data';
 
 // 像素密度
-// const dpr:number = window.devicePixelRatio;
 const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('canvas');
 const ctx: CanvasRenderingContext2D = <CanvasRenderingContext2D>canvas.getContext('2d');
 

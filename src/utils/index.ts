@@ -3,8 +3,8 @@
  * @param {any} value - The value to test.
  * @returns {Boolean}
  */
-export function isNullOrUndef(value:any) {
-    return value === null || typeof value === 'undefined';
+export function isNullOrUndef(value: any) {
+  return value === null || typeof value === 'undefined';
 }
 
 /**
@@ -13,7 +13,7 @@ export function isNullOrUndef(value:any) {
  * @returns {Boolean}
  */
 export function isObject(value: any) {
-    return value !== null && Object.prototype.toString.call(value) === '[object Object]';
+  return value !== null && Object.prototype.toString.call(value) === '[object Object]';
 }
 
 /**
@@ -22,6 +22,6 @@ export function isObject(value: any) {
  * @param {*} defaultValue - The value to return if `value` is undefined.
  * @returns {*}
  */
-export function valueOrDefault(value:any, defaultValue:any) {
-    return typeof value === 'undefined' ? defaultValue : value;
+export function valueOrDefault(value: any, defaultValue: any) {
+  return typeof value === 'undefined' ? defaultValue : value;
 }
